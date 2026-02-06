@@ -32,12 +32,18 @@ export const AuthProvider = ({ children }) => {
   const csrf = async () => {
     console.log("[AuthContext V2] Fetching CSRF cookie...");
     try {
+      // Clear old headers to ensure fresh fetch
+      delete axios.defaults.headers.common['X-XSRF-TOKEN'];
+
       await axios.get("/sanctum/csrf-cookie");
       const token = getXsrfToken();
-      console.log("[AuthContext V2] CSRF cookie fetched. Token found in cookies:", token ? "YES (exists)" : "NO (missing)");
+
+      console.log("[AuthContext V2] CSRF cookie fetched. Token:", token ? token.substring(0, 10) + "..." : "MISSING");
+
       if (token) {
-        // Manually set for the instance just in case
+        // Inject token into common headers as both formats Laravel might expect
         axios.defaults.headers.common['X-XSRF-TOKEN'] = token;
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
       }
       return !!token;
     } catch (e) {
@@ -56,18 +62,21 @@ export const AuthProvider = ({ children }) => {
         // If it's a 419 error and we haven't retried this request yet
         if (error.response?.status === 419 && !config._retry) {
           config._retry = true;
-          console.warn("[AuthContext V2] 419 detected, attempting 1x recovery...");
+          console.warn("[AuthContext V2] 419 detected. Retrying with fresh CSRF...");
 
           const refreshed = await csrf();
           if (refreshed) {
-            console.log("[AuthContext V2] CSRF refreshed, retrying original request...");
             const token = getXsrfToken();
-            console.log("[AuthContext V2] Manual token extraction check:", token ? "Found" : "NOT Found");
-
             if (token) {
-              config.headers['X-XSRF-TOKEN'] = token;
+              // Ensure the retry request has the new token in headers
+              if (config.headers.set) {
+                config.headers.set('X-XSRF-TOKEN', token);
+                config.headers.set('X-CSRF-TOKEN', token);
+              } else {
+                config.headers['X-XSRF-TOKEN'] = token;
+                config.headers['X-CSRF-TOKEN'] = token;
+              }
             }
-
             return axios(config);
           }
         }
@@ -101,20 +110,28 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setErrors([]);
     try {
-      // Ensure we have a fresh CSRF cookie before login
-      await csrf();
+      // 1. Force refresh CSRF before login attempt
+      const ok = await csrf();
+      if (!ok) {
+        toast.error("Gagal inisialisasi sesi. Coba muat ulang halaman.");
+        return;
+      }
 
-      console.log("[AuthContext V2] Attempting login to:", axios.defaults.baseURL + "/login");
+      console.log("[AuthContext V2] Posting login to:", (axios.defaults.baseURL || "") + "/login");
+
+      // 2. Perform login
       await axios.post("/login", credentials);
+
+      // 3. Get user data
       await getUser();
 
       toast.success("Login Berhasil!");
       navigate("/dashboard");
     } catch (e) {
-      console.error("Login error:", e);
+      console.error("Login error detail:", e.response?.data || e.message);
 
       if (e.code === "ERR_NETWORK") {
-        toast.error("Gagal Login, koneksi bermasalah");
+        toast.error("Gagal Login, koneksi bermasalah (CORS?)");
         return;
       }
 
@@ -123,9 +140,9 @@ export const AuthProvider = ({ children }) => {
         setErrors(e.response.data.errors || {});
         toast.error("Cek kembali username dan password anda");
       } else if (status === 419) {
-        toast.error("Sesi telah habis, silakan coba lagi");
+        toast.error("Sesi (CSRF) ditolak oleh server. Hubungi IT.");
       } else {
-        toast.error("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+        toast.error(`Terjadi kesalahan (${status || 'Unknown'}).`);
       }
     }
   };
