@@ -7,16 +7,16 @@ export default defineConfig({
   server: {
     proxy: {
       '^/(api|sanctum|logout|storage)': {
-        target: 'https://datapppds.med.unhas.ac.id',
+        target: 'https://datapppds2.med.unhas.ac.id',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: "datapppds.med.unhas.ac.id"
+        cookieDomainRewrite: "datapppds2.med.unhas.ac.id"
       },
       '/login': {
-        target: 'https://datapppds.med.unhas.ac.id',
+        target: 'https://datapppds2.med.unhas.ac.id',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: "datapppds.med.unhas.ac.id",
+        cookieDomainRewrite: "datapppds2.med.unhas.ac.id",
         bypass: (req) => {
           if (req.method === 'GET' && req.headers.accept?.includes('text/html')) {
             return '/index.html';
