@@ -11,7 +11,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const csrf = async () => {
-    await axios.get("/sanctum/csrf-cookie");
+    console.log("Fetching CSRF cookie...");
+    try {
+      await axios.get("/sanctum/csrf-cookie");
+      console.log("CSRF cookie fetched successfully");
+    } catch (e) {
+      console.error("CSRF fetch failed", e);
+    }
   };
 
   const navigate = useNavigate();
