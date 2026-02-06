@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       navigate("/dashboard");
     } catch (e) {
       console.log("err auth context", e);
-      toast.error("Gagal login");
+      toast.error("Gagal login, Lagi Maintanance....");
       if (e.code == "ERR_NETWORK") {
         toast.error("Gagal Login , koneksi bermasalah");
       }
