@@ -1,0 +1,126 @@
+<?php
+// baruus new
+namespace App\Http\Controllers;
+
+use App\Imports\ResidenImport;
+use App\Models\BeritaAcaraUjian;
+use App\Models\ResidenBiodata;
+use App\Models\ResidenKhs;
+use App\Models\ResidenKrs;
+use App\Models\AbstrakJurnal;
+use App\Models\ResidenPrestasi;
+use App\Models\Spp;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+
+class UserResidenController extends Controller
+{
+    public function index(Request $request)
+    {
+        
+            $term = $request->term;
+            return User::role('residen')->with('biodata', 'biodata.provinsi', 'biodata.kabupaten', 'biodata.prodi')->orderBy('created_at', 'desc')->where('name', 'LIKE', '%' . $term . '%')->orWhere('username', 'LIKE', '%' . $term . '%')->orWhereHas('biodata.prodi', function ($query) use ($term) {
+                $query->where('name', 'LIKE', '%' . $term . '%');
+            })->paginate(10);
+        }
+        return User::role('residen')->with('biodata', 'biodata.prodi')->orderBy('created_at', 'desc')->paginate(10);
+    }
+
+    public function sampel()
+    {
+        return response()->download('sampel/residensample.xlsx');
+    }
+
+    public function show($id)
+    {
+        return User::role('residen')->where('id', $id)->first();
+    }
+
+    public function getKhs($user)
+    {
+        return ResidenKhs::with('user')->where('user_id', $user)->get();
+    }
+
+    public function getKrs($user)
+    {
+        return ResidenKrs::with('user')->where('user_id', $user)->get();
+    }
+
+    public function getSpp($user)
+    {
+        return Spp::with('user')->where('user_id', $user)->get();
+    }
+
+    public function getPrestasi($user)
+    {
+        return ResidenPrestasi::with('user')->where('user_id', $user)->get();
+    }
+
+    public function getAbstrak($user)
+    {
+        return AbstrakJurnal::with('user')->where('user_id', $user)->get();
+    }
+
+    public function getUjian($user)
+    {
+        return BeritaAcaraUjian::with('user')->where('user_id', $user)->get();
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'username' => 'required|alpha_dash|max:255',
+            'name' => 'required|string|max:255',
+        ]);
+
+        return $user = User::where('id', $id)->update([
+            'username' => $request->username,
+            'name' => $request->name,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|unique:users|alpha_dash|max:255',
+            'name' => 'required|string|max:255',
+            'prodiId' => 'required'
+        ]);
+
+        $user = User::create([
+            'username' => $request->username,
+            'name' => $request->name,
+            'password' => bcrypt($request->username)
+        ]);
+
+        ResidenBiodata::create([
+            'user_id' => $user->id,
+            'prodi_id' => $request->prodiId,
+        ]);
+
+        $user->assignRole("residen");
+    }
+
+    public function getBiodata($id)
+    {
+        return ResidenBiodata::with('user', 'prodi', 'kabupaten', 'provinsi')->where('user_id', $id)->first();
+    }
+
+    public function destroy($id)
+    {
+        User::destroy($id);
+    }
+
+    public function deleteAll(Request $request)
+    {
+        foreach ($request->pilihan as $pilihan) {
+            User::destroy($pilihan);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        Excel::import(new ResidenImport(), $request->file('file'));
+    }
+}

@@ -11,13 +11,35 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Helper to get XSRF-TOKEN manually (bypass potential Axios issues in cross-subdomain)
+  const getXsrfToken = () => {
+    const name = "XSRF-TOKEN=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, ca.length);
+      }
+    }
+    return null;
+  };
+
   // Optimized CSRF handler - simplified as Axios automatically handles XSRF-TOKEN
   const csrf = async () => {
     console.log("[AuthContext V2] Fetching CSRF cookie...");
     try {
       await axios.get("/sanctum/csrf-cookie");
-      console.log("[AuthContext V2] CSRF cookie fetched successfully");
-      return true;
+      const token = getXsrfToken();
+      console.log("[AuthContext V2] CSRF cookie fetched. Token found in cookies:", token ? "YES (exists)" : "NO (missing)");
+      if (token) {
+        // Manually set for the instance just in case
+        axios.defaults.headers.common['X-XSRF-TOKEN'] = token;
+      }
+      return !!token;
     } catch (e) {
       console.error("[AuthContext V2] CSRF fetch failed", e);
       return false;
@@ -39,9 +61,12 @@ export const AuthProvider = ({ children }) => {
           const refreshed = await csrf();
           if (refreshed) {
             console.log("[AuthContext V2] CSRF refreshed, retrying original request...");
-            // Extract cookies manually for diagnostic (only works if NOT HttpOnly)
-            const hasCookie = document.cookie.includes("XSRF-TOKEN");
-            console.log("[AuthContext V2] XSRF-TOKEN cookie present in document.cookie:", hasCookie);
+            const token = getXsrfToken();
+            console.log("[AuthContext V2] Manual token extraction check:", token ? "Found" : "NOT Found");
+
+            if (token) {
+              config.headers['X-XSRF-TOKEN'] = token;
+            }
 
             return axios(config);
           }
