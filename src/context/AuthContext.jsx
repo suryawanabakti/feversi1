@@ -29,12 +29,21 @@ export const AuthProvider = ({ children }) => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
-        if (error.response?.status === 419) {
-          console.warn("Session expired (419), attempting to refresh CSRF and retry...");
+        const config = error.config;
+
+        // If it's a 419 error and we haven't retried this request yet
+        if (error.response?.status === 419 && !config._retry) {
+          config._retry = true;
+          console.warn("[AuthContext V2] 419 detected, attempting 1x recovery...");
+
           const refreshed = await csrf();
           if (refreshed) {
-            // Retry the original request
-            return axios(error.config);
+            console.log("[AuthContext V2] CSRF refreshed, retrying original request...");
+            // Extract cookies manually for diagnostic (only works if NOT HttpOnly)
+            const hasCookie = document.cookie.includes("XSRF-TOKEN");
+            console.log("[AuthContext V2] XSRF-TOKEN cookie present in document.cookie:", hasCookie);
+
+            return axios(config);
           }
         }
         return Promise.reject(error);
