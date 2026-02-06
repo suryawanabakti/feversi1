@@ -22,7 +22,7 @@ const PelanggaranManagement = () => {
 
   // Filter states
   const [filters, setFilters] = useState({
-  
+
     tingkat: "",
   })
 
@@ -52,7 +52,7 @@ const PelanggaranManagement = () => {
 
   }, [])
 
- 
+
 
   const fetchPelanggarans = async (searchTerm = "", pageNum = 1, filterParams = {}) => {
     setLoading(true)
@@ -107,7 +107,7 @@ const PelanggaranManagement = () => {
 
   const clearFilters = () => {
     const clearedFilters = {
-    
+
       tingkat: "",
     }
     setFilters(clearedFilters)
@@ -116,7 +116,7 @@ const PelanggaranManagement = () => {
   }
 
   const hasActiveFilters = () => {
-    return  filters.tingkat !== ""
+    return filters.tingkat !== ""
   }
 
   const handleInputChange = (e) => {
@@ -140,7 +140,7 @@ const PelanggaranManagement = () => {
     setErrors({})
 
     const submitData = new FormData()
-    
+
     submitData.append("tingkat", formData.tingkat)
     submitData.append("nama_pelanggaran", formData.nama_pelanggaran)
     submitData.append("sanksi", formData.sanksi)
@@ -183,7 +183,7 @@ const PelanggaranManagement = () => {
   const handleEdit = (item) => {
     setCurrentItem(item)
     setFormData({
-    
+
       tingkat: item.tingkat || "",
       nama_pelanggaran: item.nama_pelanggaran,
       sanksi: item.sanksi,
@@ -302,7 +302,7 @@ const PelanggaranManagement = () => {
               </span>
             )}
           </div>
-          {user.roles[0].name === "admin" && (
+          {user?.roles?.[0]?.name === "admin" && (
             <button className="btn btn-primary" onClick={openAddModal}>
               <i className="fas fa-plus mr-1"></i>
               Tambah Pelanggaran
@@ -315,7 +315,7 @@ const PelanggaranManagement = () => {
             <div className="card-header bg-white">
               <div className="d-flex justify-content-between align-items-center w-100 flex-wrap">
                 <div className="d-flex mb-2 mb-md-0">
-                  {user.roles[0].name === "admin" && (
+                  {user?.roles?.[0]?.name === "admin" && (
                     <button className="btn btn-outline-secondary mr-2" onClick={() => setShowFilters(!showFilters)}>
                       <i className={`fas fa-filter mr-1 ${hasActiveFilters() ? "text-primary" : ""}`}></i>
                       Filter
@@ -390,7 +390,7 @@ const PelanggaranManagement = () => {
                       </div>
                     </div>
 
-                  
+
 
                     <div className="col-md-4 d-flex align-items-end">
                       <div className="form-group mb-2">
@@ -427,7 +427,7 @@ const PelanggaranManagement = () => {
                         </div>
                       </th>
                       <th>Tingkat</th>
-                
+
                       <th>Nama Pelanggaran</th>
                       <th>Sanksi</th>
                       <th>File</th>
@@ -471,7 +471,7 @@ const PelanggaranManagement = () => {
                               {getTingkatLabel(data.tingkat)}
                             </span>
                           </td>
-                         
+
                           <td>
                             <div>
                               <strong className="text-primary">{data.nama_pelanggaran}</strong>
@@ -540,9 +540,8 @@ const PelanggaranManagement = () => {
                 <ul className="pagination justify-content-center mb-0">
                   {links.map((data, index) => (
                     <li
-                      className={`page-item ${data.label == page ? "active" : ""} ${
-                        data.url == null ? "disabled" : ""
-                      }`}
+                      className={`page-item ${data.label == page ? "active" : ""} ${data.url == null ? "disabled" : ""
+                        }`}
                       key={index}
                     >
                       <button
@@ -665,7 +664,7 @@ const PelanggaranManagement = () => {
                     <div className="form-group">
                       <label htmlFor="sanksi" className="font-weight-bold">
                         <i className="fas fa-gavel mr-1"></i>
-                        Sanksi 
+                        Sanksi
                       </label>
                       <textarea
                         className={`form-control ${errors.sanksi ? "is-invalid" : ""}`}
@@ -675,7 +674,7 @@ const PelanggaranManagement = () => {
                         onChange={handleInputChange}
                         placeholder="Masukkan sanksi yang diberikan..."
                         rows="3"
-                        
+
                       />
                       {errors.sanksi && <div className="invalid-feedback">{errors.sanksi[0]}</div>}
                     </div>

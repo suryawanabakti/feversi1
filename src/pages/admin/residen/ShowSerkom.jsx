@@ -86,7 +86,7 @@ const ShowSerkom = () => {
             >
               <i className="fas fa-download"></i>
             </a>
-            {user.roles[0].name == "prodi" && (
+            {user?.roles?.[0]?.name == "prodi" && (
               <button
                 onClick={() => handleDelete(cellValues.row.id)}
                 type="button"
@@ -158,7 +158,7 @@ const ShowSerkom = () => {
             <div className="card-header">
               <h4>Data Serkom, {cardHeader}</h4>
               <div className="card-header-action">
-                {user.roles[0].name == "prodi" && (
+                {user?.roles?.[0]?.name == "prodi" && (
                   <Button variant="primary" onClick={handleShow}>
                     Tambah Sertifikat Kompetensi
                   </Button>

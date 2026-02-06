@@ -133,7 +133,7 @@ const PelanggaranResidenManagement = () => {
 
   // Auto-select prodi for "prodi" role users
   useEffect(() => {
-    if (user && user.roles && (user.roles[0]?.name === "prodi" || user.roles[0]?.name === "admin_prodi") && user.prodi?.id) {
+    if (user && user.roles && (user?.roles?.[0]?.name === "prodi" || user?.roles?.[0]?.name === "admin_prodi") && user.prodi?.id) {
       const prodiIdStr = user.prodi.id.toString()
       setFormData((prev) => ({
         ...prev,

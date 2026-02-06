@@ -6,11 +6,22 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '^/(api|sanctum|login|logout|storage)': {
-        target: 'http://bankdatapppds.test',
+      '^/(api|sanctum|logout|storage)': {
+        target: 'https://datapppds.med.unhas.ac.id',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: "localhost"
+        cookieDomainRewrite: "datapppds.med.unhas.ac.id"
+      },
+      '/login': {
+        target: 'https://datapppds.med.unhas.ac.id',
+        changeOrigin: true,
+        secure: false,
+        cookieDomainRewrite: "datapppds.med.unhas.ac.id",
+        bypass: (req) => {
+          if (req.method === 'GET' && req.headers.accept?.includes('text/html')) {
+            return '/index.html';
+          }
+        }
       }
     }
   },

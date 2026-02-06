@@ -19,10 +19,16 @@ export const AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const { data } = await axios.get("/api/user");
+      // Validate that we got a JSON object, not HTML (which happens on backend redirect)
+      if (typeof data !== "object" || data === null || !data.id) {
+        throw new Error("Invalid user data received");
+      }
       setUser(data);
       setLoading(false);
     } catch (error) {
-      navigate("/");
+      console.error("Auth check failed:", error.message);
+      setLoading(false);
+      navigate("/login");
       // location.reload();
     }
   };
@@ -32,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post("/logout");
       setUser(null);
-      navigate("/");
+      navigate("/login");
     } catch (e) { }
   };
 

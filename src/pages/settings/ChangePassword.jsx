@@ -161,7 +161,7 @@ const ChangePassword = () => {
             </div>
           </div>
 
-          {user.roles[0].name === "residen" && (
+          {user?.roles?.[0]?.name === "residen" && (
             <div className="card">
               <div className="card-header">
                 <h4>NOMOR WA</h4>

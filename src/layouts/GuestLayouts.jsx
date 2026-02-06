@@ -4,7 +4,8 @@ import { Toaster } from "react-hot-toast";
 import useAuthContext from "../context/AuthContext";
 
 const GuestLayout = () => {
-  const { user } = useAuthContext();
+  const { user, loading } = useAuthContext();
+  if (loading) return null;
   return !user ? (
     <>
       <link

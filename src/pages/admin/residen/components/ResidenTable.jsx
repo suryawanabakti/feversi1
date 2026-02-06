@@ -38,8 +38,8 @@ const ResidenTable = ({
         );
     }
 
-    const isAdminOrProdi = user?.roles && (user.roles[0].name === "admin" || user.roles[0].name === "prodi");
-    const isAdmin = user?.roles && user.roles[0].name === "admin";
+    const isAdminOrProdi = user?.roles && (user?.roles?.[0]?.name === "admin" || user?.roles?.[0]?.name === "prodi");
+    const isAdmin = user?.roles && user?.roles?.[0]?.name === "admin";
 
     return (
         <div className="table-responsive">

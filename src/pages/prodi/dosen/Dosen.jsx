@@ -166,11 +166,11 @@ const Dosen = () => {
 
   useEffect(() => {
     getDosen();
-    user.roles[0].name === "admin" && getProdi();
+    user?.roles?.[0]?.name === "admin" && getProdi();
   }, []);
 
-  const isAdmin = user.roles[0].name === "admin";
-  const isProdi = user.roles[0].name === "prodi";
+  const isAdmin = user?.roles?.[0]?.name === "admin";
+  const isProdi = user?.roles?.[0]?.name === "prodi";
 
   return (
     <div className="main-content">

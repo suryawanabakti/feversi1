@@ -219,6 +219,7 @@ function App() {
 
       <Route element={<GuestLayout />}>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
       </Route>
       <Route path="/map" element={<Maps />} />
     </Routes>

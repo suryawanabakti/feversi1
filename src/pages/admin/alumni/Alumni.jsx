@@ -73,7 +73,7 @@ const Alumni = () => {
   };
 
   useEffect(() => {
-    if (user.roles[0].name === "admin") {
+    if (user?.roles?.[0]?.name === "admin") {
       getProdi();
     }
     getAlumni();
@@ -119,7 +119,7 @@ const Alumni = () => {
             <Card.Header className="bg-white">
               <div className="d-flex justify-content-between align-items-center w-100 flex-wrap">
                 <div className="d-flex mb-2 mb-md-0">
-                  {user.roles[0].name === "admin" && (
+                  {user?.roles?.[0]?.name === "admin" && (
                     <>
                       <Button
                         variant="success"

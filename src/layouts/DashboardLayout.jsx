@@ -9,8 +9,7 @@ const DashboardLayout = () => {
   const currentYear = new Date().getFullYear();
 
   if (loading) return null;
-
-  if (!user) return <Navigate to="/" />;
+  if (!user) return <Navigate to="/login" />;
 
   return (
     <>

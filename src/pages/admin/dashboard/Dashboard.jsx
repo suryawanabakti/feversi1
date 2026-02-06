@@ -15,7 +15,7 @@ const Dashboard = () => {
   const { user } = useAuthContext()
 
   // Redirect staser if needed (keeping original logic)
-  if (user?.roles[0]?.name === "staser") {
+  if (user?.roles?.[0]?.name === "staser") {
     // Note: This logic seems specific to the original implementation
     // but the original code had this check at the very top.
     // location.href = "/report-stase" 
@@ -121,7 +121,7 @@ const Dashboard = () => {
       setTotalPrestasi(data.totalPrestasi)
       setTotalBeritaAcaraUjian(data.totalBeritaAcara)
 
-      if (user?.roles[0]?.name === "admin" && data.totalStasePerProdi) {
+      if (user?.roles?.[0]?.name === "admin" && data.totalStasePerProdi) {
         setDatas({
           labels: data.totalStasePerProdi.map((dutu) => dutu.prodi?.name || "N/A"),
           datasets: [
@@ -187,7 +187,7 @@ const Dashboard = () => {
   }, [])
 
   const renderRoleDashboard = () => {
-    const role = user?.roles[0]?.name
+    const role = user?.roles?.[0]?.name
 
     switch (role) {
       case "residen":

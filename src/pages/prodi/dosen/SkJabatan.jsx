@@ -85,7 +85,7 @@ export default function SkJabatan() {
                 <div className="card-header">
                   <h4 className="">Daftar Sk Jabatan, {name} </h4>
                   <div className="card-header-action">
-                    {user.roles[0].name == "prodi" && (
+                    {user?.roles?.[0]?.name == "prodi" && (
                       <button
                         className="btn btn-primary"
                         type="button"
@@ -103,7 +103,7 @@ export default function SkJabatan() {
                         <th>No.</th>
                         <th>Jabatan Struktural</th>
                         <th>File</th>
-                        {user.roles[0].name == "prodi" && <th>Aksi</th>}
+                        {user?.roles?.[0]?.name == "prodi" && <th>Aksi</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -120,7 +120,7 @@ export default function SkJabatan() {
                                 Download
                               </a>
                             </td>
-                            {user.roles[0].name == "prodi" && (
+                            {user?.roles?.[0]?.name == "prodi" && (
                               <td>
                                 <a
                                   onClick={(e) => onDelete(e, data.id)}

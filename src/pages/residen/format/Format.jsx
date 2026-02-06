@@ -37,7 +37,7 @@ export default function Format() {
       headerName: "Aksi",
       width: "100px",
       renderCell: ({ row }) => {
-        if (user.roles[0].name === "admin") {
+        if (user?.roles?.[0]?.name === "admin") {
           return (
             <a
               href="#"
@@ -126,7 +126,7 @@ export default function Format() {
           <div className="section-body">
             <div className="row">
               <div className="col-md-12 mb-2 d-flex justify-content-between">
-                {user.roles[0].name === "admin" && (
+                {user?.roles?.[0]?.name === "admin" && (
                   <Button variant="primary" type="button" onClick={handleShow}>
                     Tambah Format
                   </Button>

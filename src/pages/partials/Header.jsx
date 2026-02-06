@@ -123,14 +123,13 @@ const Header = () => {
           </ul>
         </form>
         <ul className="navbar-nav navbar-right">
-          {user.roles[0].name === "admin" && (
+          {user?.roles?.[0]?.name === "admin" && (
             <li className="dropdown dropdown-list-toggle">
               <a
                 href="#"
                 data-toggle="dropdown"
-                className={`nav-link notification-toggle nav-link-lg ${
-                  beep ? "beep" : ""
-                }`}
+                className={`nav-link notification-toggle nav-link-lg ${beep ? "beep" : ""
+                  }`}
               >
                 <i className="far fa-bell" />
               </a>
@@ -152,12 +151,11 @@ const Header = () => {
                           data.type === "pengaduan"
                             ? `/admin-pengaduan/${data.id}`
                             : data.type === "konseling"
-                            ? `/admin-konseling/${data.id}`
-                            : `/admin-informasi/${data.id}`
+                              ? `/admin-konseling/${data.id}`
+                              : `/admin-informasi/${data.id}`
                         }
-                        className={`dropdown-item dropdown-item-unread ${
-                          data.respon ? "" : "beep"
-                        }`}
+                        className={`dropdown-item dropdown-item-unread ${data.respon ? "" : "beep"
+                          }`}
                         key={data.id}
                       >
                         <div className="dropdown-item-icon bg-primary text-white">
@@ -180,9 +178,8 @@ const Header = () => {
                   })}
                 </div>
                 <div
-                  className={`dropdown-footer text-center ${
-                    beep ? "beep" : ""
-                  }`}
+                  className={`dropdown-footer text-center ${beep ? "beep" : ""
+                    }`}
                 >
                   {notifications.length >= 5 && (
                     <a href="#">
@@ -211,9 +208,7 @@ const Header = () => {
                     </div>
                   </a>
                   <div className="dropdown-menu dropdown-menu-right">
-                    <div className="dropdown-title">
-                      Role : {user.roles[0].name}
-                    </div>
+                    Role : {user?.roles?.[0]?.name}
 
                     <Link
                       to="/change-password"

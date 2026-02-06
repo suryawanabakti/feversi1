@@ -84,7 +84,7 @@ export default function Users() {
     const handleShowEdit = (user) => {
         setModalMode("edit");
         setSelectedUser(user);
-        const userRole = user.roles && user.roles.length > 0 ? user.roles[0].name : "";
+        const userRole = user.roles && user.roles.length > 0 ? user?.roles?.[0]?.name : "";
         const selectedRole = roles.find((r) => r.value === userRole);
 
         setFormData({

@@ -54,11 +54,11 @@ const Sidebar = () => {
         </div>
         <ul className="sidebar-menu">
           <li className="menu-header">
-            {user.roles[0].name === "admin" && <>Menu Admin</>}{" "}
-            {user.roles[0].name === "residen" && <>Menu Residen</>}
-            {user.roles[0].name === "prodi" && <>Menu Prodi</>}
+            {user?.roles?.[0]?.name === "admin" && <>Menu Admin</>}{" "}
+            {user?.roles?.[0]?.name === "residen" && <>Menu Residen</>}
+            {user?.roles?.[0]?.name === "prodi" && <>Menu Prodi</>}
           </li>
-          {user.roles[0].name !== "staser" && (
+          {user?.roles?.[0]?.name !== "staser" && (
             <li className={splitLocation[1] == "dashboard" ? "active" : ""}>
               <Link
                 className="nav-link"
@@ -71,7 +71,7 @@ const Sidebar = () => {
             </li>
           )}
 
-          {user.roles[0].name == "admin" && (
+          {user?.roles?.[0]?.name == "admin" && (
             <>
               <li className={`dropdown ${openMasterData && "active"}`}>
                 <a
@@ -157,7 +157,7 @@ const Sidebar = () => {
             </>
           )}
 
-          {user.roles[0].name == "residen" && (
+          {user?.roles?.[0]?.name == "residen" && (
             <>
               <li className="menu-header">DATA RESIDEN</li>
               <li className={splitLocation[1] == "biodata" ? "active" : ""}>
@@ -234,7 +234,7 @@ const Sidebar = () => {
             </>
           )}
 
-          {user.roles[0].name == "prodi" && (
+          {user?.roles?.[0]?.name == "prodi" && (
             <>
               <li className="menu-header">Prodi Menu</li>
               <li className={splitLocation[1] == "residen" ? "active" : ""}>
@@ -340,7 +340,7 @@ const Sidebar = () => {
               </li>
             </>
           )}
-          {user.roles[0].name == "kepala" && (
+          {user?.roles?.[0]?.name == "kepala" && (
             <>
               <li className={`dropdown ${openLayanan && "active"}`}>
                 <a
@@ -379,7 +379,7 @@ const Sidebar = () => {
               </li>
             </>
           )}
-          {user.roles[0].name == "admin" && (
+          {user?.roles?.[0]?.name == "admin" && (
             <>
               {" "}
               <li className={`dropdown ${openLaporan && "active"}`}>
@@ -543,7 +543,7 @@ const Sidebar = () => {
               </li>
             </>
           )}
-          {user.roles[0].name == "admin" && (
+          {user?.roles?.[0]?.name == "admin" && (
             <li
               className={
                 splitLocation[1] == "pelanggaran-residen" ? "active" : ""
@@ -559,7 +559,7 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          {/* {user.roles[0].name == "admin" && (
+          {/* {user?.roles?.[0]?.name == "admin" && (
             <li
               className={
                 splitLocation[1] == "residen-comparison" ? "active" : ""
@@ -575,7 +575,7 @@ const Sidebar = () => {
               </Link>
             </li>
           )}
-          {user.roles[0].name == "admin" && (
+          {user?.roles?.[0]?.name == "admin" && (
             <li
               className={splitLocation[1] == "dosen-comparison" ? "active" : ""}
             >
@@ -590,7 +590,7 @@ const Sidebar = () => {
             </li>
           )} */}
 
-          {user.roles[0].name == "staser" && (
+          {user?.roles?.[0]?.name == "staser" && (
             <>
               {" "}
               <li className={`dropdown ${openLaporan && "active"}`}>
@@ -627,7 +627,7 @@ const Sidebar = () => {
             </>
           )}
 
-          {user.roles[0].name == "residen" && (
+          {user?.roles?.[0]?.name == "residen" && (
             <>
               <li className={`dropdown ${openLayanan && "active"}`}>
                 <a
@@ -677,7 +677,7 @@ const Sidebar = () => {
           )}
 
           <li className="menu-header">INFORMASI</li>
-          {user.roles[0].name == "residen" && (
+          {user?.roles?.[0]?.name == "residen" && (
             <li className={splitLocation[1] == "format" ? "active" : ""}>
               <Link
                 className="nav-link"

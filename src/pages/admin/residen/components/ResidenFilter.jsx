@@ -13,7 +13,7 @@ const ResidenFilter = ({
     onSearchChange,
     onSearchSubmit
 }) => {
-    const isAdmin = user?.roles && user.roles[0].name === "admin";
+    const isAdmin = user?.roles && user?.roles?.[0]?.name === "admin";
 
     return (
         <div className="row mb-4">

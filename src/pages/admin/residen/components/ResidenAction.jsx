@@ -11,8 +11,8 @@ const ResidenAction = ({
     onExport,
     onRefresh
 }) => {
-    const isAdmin = user?.roles && user.roles[0].name === "admin";
-    const isProdi = user?.roles && user.roles[0].name === "prodi";
+    const isAdmin = user?.roles && user?.roles?.[0]?.name === "admin";
+    const isProdi = user?.roles && user?.roles?.[0]?.name === "prodi";
     const hasAccess = isAdmin || isProdi;
 
     return (
