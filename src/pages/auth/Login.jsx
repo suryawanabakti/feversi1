@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const { login, login2, errors } = useAuthContext();
+  const { login, errors } = useAuthContext();
   const handleLogin = async (credentials) => {
     setIsLoading(true);
     setError(null);
