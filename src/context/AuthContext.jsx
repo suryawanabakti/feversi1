@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     await csrf();
     console.log(data);
     try {
-      await axios.post("/login", { ...data });
+      await axios.post("/api/login", { ...data });
 
       await getUser();
       navigate("/dashboard");

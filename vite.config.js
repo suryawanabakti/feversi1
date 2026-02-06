@@ -6,13 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '^/(api|sanctum|logout|storage)': {
-        target: 'https://datapppds2.med.unhas.ac.id',
-        changeOrigin: true,
-        secure: false,
-        cookieDomainRewrite: "datapppds2.med.unhas.ac.id"
-      },
-      '/login': {
+      '^/(api|sanctum|login|logout|storage)': {
         target: 'https://datapppds2.med.unhas.ac.id',
         changeOrigin: true,
         secure: false,
