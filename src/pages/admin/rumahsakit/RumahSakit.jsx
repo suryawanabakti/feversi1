@@ -72,6 +72,14 @@ const RumahSakit = () => {
     setCurrentPage(1)
   }
 
+  const handleKategoriChange = (value, checked) => {
+    if (checked) {
+      setKategori([...kategori, value])
+    } else {
+      setKategori(kategori.filter((item) => item !== value))
+    }
+  }
+
   const handleSave = async (e) => {
     setLoading(true)
     e.preventDefault()
@@ -136,7 +144,7 @@ const RumahSakit = () => {
   const getRumahSakit = async () => {
     setLoading(true)
     try {
-      const res = await axios.get("/api/rumahsakit")
+      const res = await axios.get("/api/rumahsakit?per_page=10000")
       setRumahSakit(res.data.data) // Updated to access data via resource wrapper
       setFilteredRumahSakit(res.data.data)
     } catch (err) {
@@ -507,10 +515,10 @@ const RumahSakit = () => {
             <div className="modal-content">
               <div className="modal-header bg-primary text-white">
                 <h5 className="modal-title font-weight-bold">
-                  <i className="fas fa-plus-circle mr-2"></i>
+                  <i className="fas fa-edit mr-2"></i>
                   Edit Rumah Sakit
                 </h5>
-                <button type="button" className="close text-white" onClick={handleClose}>
+                <button type="button" className="close text-white" onClick={handleCloseEdt}>
                   <span>&times;</span>
                 </button>
               </div>
@@ -518,7 +526,7 @@ const RumahSakit = () => {
                 <div className="modal-body p-4">
                   <div className="alert alert-info">
                     <i className="fas fa-info-circle mr-2"></i>
-                    Lengkapi form di bawah untuk menambah rumah sakit baru
+                    Lengkapi form di bawah untuk mengubah data rumah sakit
                   </div>
 
                   <div className="form-group mb-3">
@@ -616,7 +624,7 @@ const RumahSakit = () => {
                   </div>
                 </div>
                 <div className="modal-footer bg-light">
-                  <button type="button" className="btn btn-secondary" onClick={handleClose} disabled={loading}>
+                  <button type="button" className="btn btn-secondary" onClick={handleCloseEdt} disabled={loading}>
                     <i className="fas fa-times mr-2"></i>
                     Batal
                   </button>

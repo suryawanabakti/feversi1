@@ -33,10 +33,10 @@ const Create = (props) => {
       console.log(res)
 
       props.addRumahsakit({
-        id: res.data.id,
-        name: res.data.name,
-        is_active: res.data.is_active,
-        kategori: res.data.kategori,
+        id: res.data.data.id,
+        name: res.data.data.name,
+        is_active: res.data.data.is_active,
+        kategori: res.data.data.kategori,
       })
 
       // Reset form
