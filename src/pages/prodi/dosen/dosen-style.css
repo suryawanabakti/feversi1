@@ -1,0 +1,109 @@
+/* Custom styles for the Dosen component */
+
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-header h1 {
+  margin-bottom: 0;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  vertical-align: middle;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.pagination {
+  margin-bottom: 0;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-radius: 0.5rem;
+  border: none;
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 1rem;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.card-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 1rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.empty-state {
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.badge {
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.badge-primary {
+  background-color: #4e73df;
+}
+
+.badge-success {
+  background-color: #1cc88a;
+}
+
+.badge-info {
+  background-color: #36b9cc;
+}
+
+.badge-warning {
+  background-color: #f6c23e;
+}
+
+.badge-danger {
+  background-color: #e74a3b;
+}
+
+@media (max-width: 768px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+  }
+
+  .d-flex.justify-content-between > div {
+    margin-bottom: 1rem;
+    width: 100%;
+  }
+
+  .d-flex.justify-content-between > div:last-child {
+    margin-bottom: 0;
+  }
+}
