@@ -15,9 +15,6 @@ export const AuthProvider = ({ children }) => {
   const csrf = async () => {
     try {
       await axios.get("/sanctum/csrf-cookie");
-      // Check if cookie is readable by JS
-      const hasCookie = document.cookie.includes("XSRF-TOKEN");
-      console.log("[AuthContext Phase 3] CSRF fetched. Cookie readable by JS:", hasCookie);
       return true;
     } catch (e) {
       console.error("CSRF fetch failed", e);
