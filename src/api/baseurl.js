@@ -1,3 +1,4 @@
-export default "https://datapppds2.med.unhas.ac.id";
+// Use VITE_API_URL from environment variables if defined, otherwise fallback to relative paths
+const baseurl = import.meta.env.VITE_API_URL || "";
 
-// export default "https://datapppds2.med.unhas.ac.id";
+export default baseurl;

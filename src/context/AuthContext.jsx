@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -9,107 +9,136 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
+  // Optimized CSRF handler - simplified as Axios automatically handles XSRF-TOKEN
   const csrf = async () => {
-    console.log("Fetching CSRF cookie...");
+    console.log("[AuthContext V2] Fetching CSRF cookie...");
     try {
       await axios.get("/sanctum/csrf-cookie");
-      console.log("CSRF cookie fetched successfully");
+      console.log("[AuthContext V2] CSRF cookie fetched successfully");
+      return true;
     } catch (e) {
-      console.error("CSRF fetch failed", e);
+      console.error("[AuthContext V2] CSRF fetch failed", e);
+      return false;
     }
   };
 
-  const navigate = useNavigate();
+  // Interceptor to handle 419 (Session Expired / CSRF Mismatch)
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response?.status === 419) {
+          console.warn("Session expired (419), attempting to refresh CSRF and retry...");
+          const refreshed = await csrf();
+          if (refreshed) {
+            // Retry the original request
+            return axios(error.config);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, []);
 
   const getUser = async () => {
     try {
       const { data } = await axios.get("/api/user");
-      // Safety check: ensure we got a valid user object, not HTML or something else
       if (data && typeof data === 'object' && data.id) {
         setUser(data);
+      } else {
+        setUser(null);
       }
-      setLoading(false);
     } catch (error) {
-      // Only log errors that aren't 401 (Unauthenticated) to keep console clean
+      setUser(null);
       if (error.response?.status !== 401) {
         console.error("Auth check failed:", error.message);
       }
+    } finally {
       setLoading(false);
-      navigate("/login");
+    }
+  };
+
+  const login = async (credentials) => {
+    setErrors([]);
+    try {
+      // Ensure we have a fresh CSRF cookie before login
+      await csrf();
+
+      console.log("[AuthContext V2] Attempting login to:", axios.defaults.baseURL + "/login");
+      await axios.post("/login", credentials);
+      await getUser();
+
+      toast.success("Login Berhasil!");
+      navigate("/dashboard");
+    } catch (e) {
+      console.error("Login error:", e);
+
+      if (e.code === "ERR_NETWORK") {
+        toast.error("Gagal Login, koneksi bermasalah");
+        return;
+      }
+
+      const status = e.response?.status;
+      if (status === 422) {
+        setErrors(e.response.data.errors || {});
+        toast.error("Cek kembali username dan password anda");
+      } else if (status === 419) {
+        toast.error("Sesi telah habis, silakan coba lagi");
+      } else {
+        toast.error("Terjadi kesalahan sistem. Silakan coba lagi nanti.");
+      }
     }
   };
 
   const logout = async () => {
-    await csrf();
     try {
       await axios.post("/logout");
+    } catch (e) {
+      console.error("Logout error:", e);
+    } finally {
       setUser(null);
       navigate("/login");
-    } catch (e) { }
-  };
-
-  const login = async ({ ...data }) => {
-    await csrf();
-    console.log(data);
-    try {
-      await axios.post("/login", { ...data });
-
-      await getUser();
-      navigate("/dashboard");
-    } catch (e) {
-      console.log("err auth context", e);
-      toast.error("Gagal login, Lagi Maintanance....");
-      if (e.code == "ERR_NETWORK") {
-        toast.error("Gagal Login , koneksi bermasalah");
-      }
-      if (e.response) {
-        if (e.response.status == 422) {
-          toast.error("Cek kembali username dan password anda");
-          setErrors(e.response.data.errors);
-        }
-      }
     }
   };
 
-
-
-  const addUser = async ({ ...data }) => {
-    await csrf();
+  const addUser = async (data) => {
+    setErrors([]);
     try {
       await axios.post("/api/users", data);
-      alert("berhasil");
+      toast.success("User berhasil ditambahkan");
       navigate("/users");
     } catch (e) {
-      if (e.response.status == 422) {
-        setErrors(e.response.data.errors);
+      if (e.response?.status === 422) {
+        setErrors(e.response.data.errors || {});
+      } else {
+        toast.error("Gagal menambahkan user");
       }
     }
   };
 
-  const addProduct = async ({ ...data }) => { };
-
   useEffect(() => {
-    if (!user) {
-      getUser();
-    }
+    getUser();
   }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        errors,
-        getUser,
-        login,
-        logout,
-        setErrors,
-        addUser,
-        addProduct,
-        loading,
+  const contextValue = useMemo(() => ({
+    user,
+    errors,
+    loading,
+    getUser,
+    login,
+    logout,
+    setErrors,
+    addUser,
+  }), [user, errors, loading]);
 
-      }}
-    >
+  return (
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
