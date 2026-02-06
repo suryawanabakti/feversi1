@@ -19,17 +19,13 @@ export const AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const { data } = await axios.get("/api/user");
-      // Validate that we got a JSON object, not HTML (which happens on backend redirect)
-      if (typeof data !== "object" || data === null || !data.id) {
-        throw new Error("Invalid user data received");
-      }
       setUser(data);
       setLoading(false);
     } catch (error) {
+      console.log("ERROR", error)
       console.error("Auth check failed:", error.message);
       setLoading(false);
       navigate("/login");
-      // location.reload();
     }
   };
 
@@ -65,32 +61,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login2 = async ({ ...data }) => {
-    await csrf();
-    try {
-      await axios
-        .post("/login-sso", {
-          ...data,
-        })
-        .then((res) => { });
 
-      await getUser();
-      // navigate("/dashboard");
-    } catch (e) {
-      // toast.error("Gagal login");
-      if (e.code == "ERR_NETWORK") {
-        toast.error("Gagal Login , koneksi bermasalah");
-      }
-      if (e.response) {
-        if (e.response.status == 419) {
-          alert("login sso ...");
-        }
-        if (e.response.status == 422) {
-          setErrors(e.response.data.errors);
-        }
-      }
-    }
-  };
 
   const addUser = async ({ ...data }) => {
     await csrf();
@@ -125,7 +96,7 @@ export const AuthProvider = ({ children }) => {
         addUser,
         addProduct,
         loading,
-        login2,
+
       }}
     >
       {children}

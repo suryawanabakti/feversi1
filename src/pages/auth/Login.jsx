@@ -26,6 +26,7 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
+
       <div className="login-container">
         {/* Left Side - Branding */}
         <div className="login-branding">
@@ -38,7 +39,8 @@ export default function LoginPage() {
             <h1 className="branding-title">Bank Data PPPDS</h1>
             <p className="branding-subtitle">
               Platform ini berfungsi sebagai pusat data terpusat (centralized
-              data repository)
+              data repository) <br />
+              <small>versi 1.0.2</small>
             </p>
             <div className="branding-features">
               <div className="feature-item">
@@ -92,12 +94,7 @@ export default function LoginPage() {
       </div>
 
       {/* Background Elements */}
-      <div className="bg-gradient"></div>
-      <div className="floating-shapes">
-        <div className="shape shape-1"></div>
-        <div className="shape shape-2"></div>
-        <div className="shape shape-3"></div>
-      </div>
+
     </div>
   );
 }
