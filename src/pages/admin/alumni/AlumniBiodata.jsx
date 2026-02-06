@@ -1,63 +1,102 @@
-import { useState, useEffect } from "react";
-import { toast } from "react-hot-toast";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import axios from "../../../api/axios";
-import baseurl from "../../../api/baseurl";
-import { Spinner } from "react-bootstrap";
-import "./residen-biodata-styles.css";
-const AlumniBiodata = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("personal");
+"use client"
+
+import { useState, useEffect } from "react"
+import { toast } from "react-hot-toast"
+import { Link, useParams, useNavigate } from "react-router-dom"
+import axios from "../../../api/axios"
+import baseurl from "../../../api/baseurl"
+import { Spinner } from "react-bootstrap"
+import "./residen-biodata-styles.css"
+const ResidenBiodata = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("personal")
+
+  const [avatarUrl, setAvatarUrl] = useState(null)
 
   const getResiden = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const res = await axios.get("/api/residen/biodata/" + id);
-      setData(res.data);
+      const res = await axios.get("/api/residen/biodata/" + id)
+      setData(res.data)
+
+      // Fetch avatar if exists
+      if (res.data.pas_foto) {
+        try {
+          const avatarRes = await axios.get(`/api/documents/pas_foto/${res.data.pas_foto}`, {
+            responseType: "blob",
+          })
+          const url = URL.createObjectURL(avatarRes.data)
+          setAvatarUrl(url)
+        } catch (error) {
+          console.error("Failed to load avatar", error)
+        }
+      }
     } catch (err) {
-      console.log(err);
-      toast.error("Gagal mengambil data residen");
+      console.log(err)
+      toast.error("Gagal mengambil data residen")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    getResiden();
-  }, []);
+    getResiden()
+    return () => {
+      // Cleanup blob url
+      if (avatarUrl) URL.revokeObjectURL(avatarUrl)
+    }
+  }, [])
 
   const DocumentLink = ({ path, filename, type }) => {
-    if (!filename) return <span className="text-muted">Tidak tersedia</span>;
+    if (!filename) return <span className="text-muted">Tidak tersedia</span>
+
+    const handleViewDocument = async (e) => {
+      e.preventDefault();
+      const toastId = toast.loading("Membuka dokumen...");
+      console.log(filename)
+      try {
+        const response = await axios.get(`/api/documents/${type}/${filename}`, {
+          responseType: "blob",
+        });
+        console.log(response)
+        // Create blob url
+        const file = new Blob([response.data], { type: response.headers["content-type"] });
+        const fileURL = URL.createObjectURL(file);
+
+        // Open in new tab
+        window.open(fileURL, "_blank");
+        toast.dismiss(toastId);
+      } catch (error) {
+        console.error(error);
+        toast.dismiss(toastId);
+        toast.error("Gagal membuka dokumen. Anda mungkin tidak memiliki akses.");
+      }
+    };
 
     return (
-      <a
-        href={`${baseurl}/storage/${type}/${filename}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="document-link"
-      >
+      <a href="#" onClick={handleViewDocument} className="document-link">
         <i className="fas fa-file-alt mr-2"></i>
         <span>Lihat Dokumen</span>
       </a>
-    );
-  };
+    )
+  }
 
   return (
     <div className="main-content">
       <section className="section">
         <div className="section-header d-flex justify-content-between align-items-center">
           <div>
-            <h1>Biodata Residen</h1>
+            <h1>Alumni Biodata</h1>
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb bg-transparent p-0">
                 <li className="breadcrumb-item">
                   <Link to="/dashboard">Dashboard</Link>
                 </li>
                 <li className="breadcrumb-item">
-                  <Link to="/residen">Residen</Link>
+                  <Link to="/alumni">Alumni</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
                   Biodata
@@ -86,10 +125,7 @@ const AlumniBiodata = () => {
                 </div>
                 <h2>Data Tidak Tersedia</h2>
                 <p className="lead">Residen ini belum mengisi biodata</p>
-                <button
-                  className="btn btn-primary mt-4"
-                  onClick={() => navigate(-1)}
-                >
+                <button className="btn btn-primary mt-4" onClick={() => navigate(-1)}>
                   Kembali
                 </button>
               </div>
@@ -101,11 +137,12 @@ const AlumniBiodata = () => {
               <div className="col-12">
                 <div className="card profile-widget">
                   <div className="profile-widget-header">
-                    {data.pas_foto ? (
+                    {data.pas_foto && avatarUrl ? (
                       <img
-                        src={`${baseurl}/storage/pasfoto/${data.pas_foto}`}
+                        src={avatarUrl}
                         alt="Foto Profil"
                         className="rounded-circle profile-widget-picture"
+                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                       />
                     ) : (
                       <div className="profile-widget-picture profile-widget-picture-default">
@@ -115,25 +152,15 @@ const AlumniBiodata = () => {
                     <div className="profile-widget-items">
                       <div className="profile-widget-item">
                         <div className="profile-widget-item-label">NIM</div>
-                        <div className="profile-widget-item-value">
-                          {data.user?.username || "-"}
-                        </div>
+                        <div className="profile-widget-item-value">{data.user?.username || "-"}</div>
                       </div>
                       <div className="profile-widget-item">
-                        <div className="profile-widget-item-label">
-                          Program Studi
-                        </div>
-                        <div className="profile-widget-item-value">
-                          {data.prodi?.name || "-"}
-                        </div>
+                        <div className="profile-widget-item-label">Program Studi</div>
+                        <div className="profile-widget-item-value">{data.prodi?.name || "-"}</div>
                       </div>
                       <div className="profile-widget-item">
-                        <div className="profile-widget-item-label">
-                          Tahun Masuk
-                        </div>
-                        <div className="profile-widget-item-value">
-                          {data.tahunmasuk || "-"}
-                        </div>
+                        <div className="profile-widget-item-label">Tahun Masuk</div>
+                        <div className="profile-widget-item-value">{data.tahunmasuk || "-"}</div>
                       </div>
                     </div>
                   </div>
@@ -156,28 +183,16 @@ const AlumniBiodata = () => {
                     <h4>Dokumen dan Informasi Residen</h4>
                     <div className="card-header-action">
                       <div className="btn-group">
-                        <Link
-                          to={`/residen/khs/${id}`}
-                          className="btn btn-info"
-                        >
+                        <Link to={`/residen/khs/${id}`} className="btn btn-info">
                           <i className="fas fa-file-alt mr-1"></i> KHS
                         </Link>
-                        <Link
-                          to={`/residen/krs/${id}`}
-                          className="btn btn-info"
-                        >
+                        <Link to={`/residen/krs/${id}`} className="btn btn-info">
                           <i className="fas fa-file-alt mr-1"></i> KRS
                         </Link>
-                        <Link
-                          to={`/residen/spp/${id}`}
-                          className="btn btn-info"
-                        >
+                        <Link to={`/residen/spp/${id}`} className="btn btn-info">
                           <i className="fas fa-money-bill mr-1"></i> SPP
                         </Link>
-                        <Link
-                          to={`/residen/ujian/${id}`}
-                          className="btn btn-info"
-                        >
+                        <Link to={`/residen/ujian/${id}`} className="btn btn-info">
                           <i className="fas fa-clipboard-list mr-1"></i> Ujian
                         </Link>
                         <div className="dropdown">
@@ -191,29 +206,15 @@ const AlumniBiodata = () => {
                           >
                             Lainnya
                           </button>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="dropdownMenuButton"
-                          >
-                            <Link
-                              to={`/residen/prestasi/${id}`}
-                              className="dropdown-item"
-                            >
+                          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <Link to={`/residen/prestasi/${id}`} className="dropdown-item">
                               <i className="fas fa-trophy mr-2"></i> Prestasi
                             </Link>
-                            <Link
-                              to={`/residen/abstrak/${id}`}
-                              className="dropdown-item"
-                            >
-                              <i className="fas fa-book mr-2"></i> Abstrak
-                              Jurnal
+                            <Link to={`/residen/abstrak/${id}`} className="dropdown-item">
+                              <i className="fas fa-book mr-2"></i> Abstrak Jurnal
                             </Link>
-                            <Link
-                              to={`/residen/serkom/${id}`}
-                              className="dropdown-item"
-                            >
-                              <i className="fas fa-certificate mr-2"></i>{" "}
-                              Sertifikat Kompetensi
+                            <Link to={`/residen/serkom/${id}`} className="dropdown-item">
+                              <i className="fas fa-certificate mr-2"></i> Sertifikat Kompetensi
                             </Link>
                           </div>
                         </div>
@@ -224,9 +225,7 @@ const AlumniBiodata = () => {
                     <ul className="nav nav-tabs" id="myTab" role="tablist">
                       <li className="nav-item">
                         <a
-                          className={`nav-link ${
-                            activeTab === "personal" ? "active" : ""
-                          }`}
+                          className={`nav-link ${activeTab === "personal" ? "active" : ""}`}
                           onClick={() => setActiveTab("personal")}
                           role="tab"
                         >
@@ -236,9 +235,7 @@ const AlumniBiodata = () => {
                       </li>
                       <li className="nav-item">
                         <a
-                          className={`nav-link ${
-                            activeTab === "education" ? "active" : ""
-                          }`}
+                          className={`nav-link ${activeTab === "education" ? "active" : ""}`}
                           onClick={() => setActiveTab("education")}
                           role="tab"
                         >
@@ -248,9 +245,7 @@ const AlumniBiodata = () => {
                       </li>
                       <li className="nav-item">
                         <a
-                          className={`nav-link ${
-                            activeTab === "documents" ? "active" : ""
-                          }`}
+                          className={`nav-link ${activeTab === "documents" ? "active" : ""}`}
                           onClick={() => setActiveTab("documents")}
                           role="tab"
                         >
@@ -262,11 +257,7 @@ const AlumniBiodata = () => {
 
                     <div className="tab-content p-3">
                       {/* Tab Data Pribadi */}
-                      <div
-                        className={`tab-pane fade ${
-                          activeTab === "personal" ? "show active" : ""
-                        }`}
-                      >
+                      <div className={`tab-pane fade ${activeTab === "personal" ? "show active" : ""}`}>
                         <div className="table-responsive">
                           <table className="table table-bordered table-striped">
                             <tbody>
@@ -304,9 +295,7 @@ const AlumniBiodata = () => {
                               </tr>
                               <tr>
                                 <th>NPWP</th>
-                                <td>
-                                  {data.npwp !== "null" ? data.npwp : "-"}
-                                </td>
+                                <td>{data.npwp !== "null" ? data.npwp : "-"}</td>
                               </tr>
                               <tr>
                                 <th>Nomor Rekening</th>
@@ -326,11 +315,7 @@ const AlumniBiodata = () => {
                       </div>
 
                       {/* Tab Pendidikan */}
-                      <div
-                        className={`tab-pane fade ${
-                          activeTab === "education" ? "show active" : ""
-                        }`}
-                      >
+                      <div className={`tab-pane fade ${activeTab === "education" ? "show active" : ""}`}>
                         <div className="table-responsive">
                           <table className="table table-bordered table-striped">
                             <tbody>
@@ -355,15 +340,14 @@ const AlumniBiodata = () => {
                                 <td>
                                   {data.akreditasi ? (
                                     <span
-                                      className={`badge badge-${
-                                        data.akreditasi === "A"
-                                          ? "success"
-                                          : data.akreditasi === "B"
+                                      className={`badge badge-${data.akreditasi === "A"
+                                        ? "success"
+                                        : data.akreditasi === "B"
                                           ? "info"
                                           : data.akreditasi === "C"
-                                          ? "warning"
-                                          : "secondary"
-                                      }`}
+                                            ? "warning"
+                                            : "secondary"
+                                        }`}
                                     >
                                       {data.akreditasi}
                                     </span>
@@ -381,21 +365,16 @@ const AlumniBiodata = () => {
                                 <td>{data.tempat_kerja_sebelumnya || "-"}</td>
                               </tr>
                               <tr>
-                                <th>Tempat Kerja Sekarang</th>
-                                <td>{data.tempat_bertugas}</td>
-                              </tr>
-                              <tr>
                                 <th>Status Pembiayaan</th>
                                 <td>
                                   {data.status_pembiyaan ? (
                                     <span
-                                      className={`badge badge-${
-                                        data.status_pembiyaan === "beasiswa"
-                                          ? "success"
-                                          : data.status_pembiyaan === "mandiri"
+                                      className={`badge badge-${data.status_pembiyaan === "beasiswa"
+                                        ? "success"
+                                        : data.status_pembiyaan === "mandiri"
                                           ? "primary"
                                           : "info"
-                                      }`}
+                                        }`}
                                     >
                                       {data.status_pembiyaan === "beasiswa"
                                         ? `${data.status_pembiyaan} - ${data.beasiswa}`
@@ -418,11 +397,7 @@ const AlumniBiodata = () => {
                       </div>
 
                       {/* Tab Dokumen */}
-                      <div
-                        className={`tab-pane fade ${
-                          activeTab === "documents" ? "show active" : ""
-                        }`}
-                      >
+                      <div className={`tab-pane fade ${activeTab === "documents" ? "show active" : ""}`}>
                         <div className="row">
                           <div className="col-md-6">
                             <div className="table-responsive">
@@ -431,64 +406,43 @@ const AlumniBiodata = () => {
                                   <tr>
                                     <th width="40%">KTP</th>
                                     <td>
-                                      <DocumentLink
-                                        type="ktp"
-                                        filename={data.ktp}
-                                      />
+                                      <DocumentLink type="ktp" filename={data.ktp} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Akte Lahir</th>
                                     <td>
-                                      <DocumentLink
-                                        type="akte"
-                                        filename={data.akte}
-                                      />
+                                      <DocumentLink type="akte" filename={data.akte} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Kartu Keluarga</th>
                                     <td>
-                                      <DocumentLink
-                                        type="kartukeluarga"
-                                        filename={data.kartu_keluarga}
-                                      />
+                                      <DocumentLink type="kartu_keluarga" filename={data.kartu_keluarga} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Bukti Lulus</th>
                                     <td>
-                                      <DocumentLink
-                                        type="buktilulus"
-                                        filename={data.bukti_lulus}
-                                      />
+                                      <DocumentLink type="bukti_lulus" filename={data.bukti_lulus} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Ijazah Terakhir</th>
                                     <td>
-                                      <DocumentLink
-                                        type="ijazahterakhir"
-                                        filename={data.ijazah_terakhir}
-                                      />
+                                      <DocumentLink type="ijazah_terakhir" filename={data.ijazah_terakhir} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>SK PNS</th>
                                     <td>
-                                      <DocumentLink
-                                        type="skpns"
-                                        filename={data.sk_pns}
-                                      />
+                                      <DocumentLink type="sk_pns" filename={data.sk_pns} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>SK Penerima Beasiswa</th>
                                     <td>
-                                      <DocumentLink
-                                        type="skpenerimabeasiswa"
-                                        filename={data.sk_penerima_beasiswa}
-                                      />
+                                      <DocumentLink type="sk_penerima_beasiswa" filename={data.sk_penerima_beasiswa} />
                                     </td>
                                   </tr>
                                 </tbody>
@@ -503,7 +457,7 @@ const AlumniBiodata = () => {
                                     <th width="40%">Bukti Rekomendasi Asal</th>
                                     <td>
                                       <DocumentLink
-                                        type="buktirekomendasiasal"
+                                        type="bukti_rekomendasi_asal"
                                         filename={data.bukti_rekomendasi_asal}
                                       />
                                     </td>
@@ -511,46 +465,31 @@ const AlumniBiodata = () => {
                                   <tr>
                                     <th>BPJS</th>
                                     <td>
-                                      <DocumentLink
-                                        type="bpjs"
-                                        filename={data.bpjs}
-                                      />
+                                      <DocumentLink type="bpjs" filename={data.bpjs} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>SIP</th>
                                     <td>
-                                      <DocumentLink
-                                        type="sip"
-                                        filename={data.sip}
-                                      />
+                                      <DocumentLink type="sip" filename={data.sip} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>STR</th>
                                     <td>
-                                      <DocumentLink
-                                        type="str"
-                                        filename={data.str}
-                                      />
+                                      <DocumentLink type="str" filename={data.str} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Pas Foto</th>
                                     <td>
-                                      <DocumentLink
-                                        type="pasfoto"
-                                        filename={data.pas_foto}
-                                      />
+                                      <DocumentLink type="pas_foto" filename={data.pas_foto} />
                                     </td>
                                   </tr>
                                   <tr>
                                     <th>Nilai TOEFL</th>
                                     <td>
-                                      <DocumentLink
-                                        type="nilaitoefl"
-                                        filename={data.nilai_toefl}
-                                      />
+                                      <DocumentLink type="nilai_toefl" filename={data.nilai_toefl} />
                                     </td>
                                   </tr>
                                 </tbody>
@@ -568,7 +507,7 @@ const AlumniBiodata = () => {
         )}
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default AlumniBiodata;
+export default ResidenBiodata
