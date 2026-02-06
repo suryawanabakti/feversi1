@@ -16,8 +16,9 @@ export default function LoginPage() {
     try {
       // Simulasi login API call
       await login(credentials);
-      console.log("Login success:", credentials);
+
     } catch (err) {
+      console.log("ERROR login.jsx", err)
       setError("Gagal login. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
