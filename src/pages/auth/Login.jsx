@@ -41,7 +41,7 @@ export default function LoginPage() {
             <p className="branding-subtitle">
               Platform ini berfungsi sebagai pusat data terpusat (centralized
               data repository) <br />
-              <small>versi 1.0.6</small>
+              <small>versi 1.0.7</small>
             </p>
             <div className="branding-features">
               <div className="feature-item">

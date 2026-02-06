@@ -72,10 +72,13 @@ export default function ReportBeritaAcaraUjian() {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Berita Acara Ujian</h1>
-            <p className="text-muted mt-1">Laporan status ujian kelulusan residen.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Berita Acara Ujian</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Berita Acara Ujian</div>
           </div>
         </div>
 
@@ -94,8 +97,7 @@ export default function ReportBeritaAcaraUjian() {
                         <Form.Label className="small fw-bold text-muted text-uppercase">Program Studi</Form.Label>
                         <Form.Select
                           disabled={loading}
-                          className="bg-light border-0"
-                          style={{ borderRadius: '10px', height: '45px' }}
+
                           value={prodiId}
                           onChange={(e) => setProdiId(e.target.value)}
                         >

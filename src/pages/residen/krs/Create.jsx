@@ -1,172 +1,162 @@
 import React, { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import Spinner from "react-bootstrap/Spinner";
-import Form from "react-bootstrap/Form";
+import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import axios from "../../../api/axios";
 import { toast } from "react-hot-toast";
 
-const Create = (props) => {
-  const [tahunAjaran, setTahunAjaran] = useState([]);
-  const getTahunAjaran = async () => {
-    const res = await axios.get("/api/tahun-ajaran");
-    console.log("tahunAjaran", res);
-    setTahunAjaran(res.data);
-  };
-  const [semester, setSemester] = useState("");
-  const [krs, setKrs] = useState();
-  const [tahun, setTahun] = useState("");
+/**
+ * Create KRS Component
+ * 
+ * Modal form for uploading new KRS (Kartu Rencana Studi).
+ */
+const Create = ({ show, handleClose, getKrs }) => {
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
-
-  const handleSave = async (e) => {
-    setLoading(true);
-    e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append("semester", semester);
-      formData.append("tahun", tahun);
-      krs && formData.append("krs", krs);
-      const response = await axios({
-        method: "post",
-        url: "/api/krs",
-        data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      toast.success("berhasil simpan");
-      setErrors([]);
-      console.log(response);
-      props.addKrs({
-        id: response.data.id,
-        tahun: response.data.tahun,
-        semester: response.data.semester,
-        krs: response.data.krs,
-        created_at: response.data.created_at,
-      });
-      props.handleClose();
-    } catch (err) {
-      toast.error("Gagal KRS");
-      console.log(err);
-      if (err.code == "ERR_NETWORK") {
-        toast.error("Gagal KRS , koneksi bermasalah");
-        alert("error akhir sesi berrakhir, segera reload browser");
-        location.reload();
-      }
-      if (err.response) {
-        if (err.response.status == 422) {
-          setErrors(err.response.data.errors);
-        } else {
-          alert("error akhir sesi berrakhir, segera reload browser");
-          location.reload();
-        }
-      } else {
-        alert("error akhir sesi berrakhir, segera reload browser");
-        location.reload();
-      }
-    }
-    setLoading(false);
-  };
+  const [semester, setSemester] = useState("");
+  const [tahun, setTahun] = useState("");
+  const [krs, setKrs] = useState(null);
+  const [tahunAjaran, setTahunAjaran] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    getTahunAjaran();
-  }, []);
+    if (show) {
+      getTahunAjaran();
+    }
+  }, [show]);
+
+  const getTahunAjaran = async () => {
+    try {
+      const res = await axios.get("/api/tahun-ajaran");
+      setTahunAjaran(res.data);
+    } catch (err) {
+      console.error("Gagal mengambil tahun ajaran", err);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!semester || !tahun || !krs) {
+      toast.error("Semua field bertanda * wajib diisi.");
+      return;
+    }
+
+    setLoading(true);
+    setErrors({});
+
+    const formData = new FormData();
+    formData.append("semester", semester);
+    formData.append("tahun", tahun);
+    formData.append("krs", krs);
+
+    try {
+      await axios.post("/api/krs", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("KRS berhasil diunggah");
+      resetForm();
+      handleClose();
+      getKrs();
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 422) {
+        setErrors(err.response.data.errors);
+        toast.error("Validasi gagal. Silakan cek form.");
+      } else {
+        toast.error(err.response?.data?.message || "Gagal mengunggah KRS");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setSemester("");
+    setTahun("");
+    setKrs(null);
+    setErrors({});
+  };
+
   return (
-    <Modal show={props.show} onHide={props.handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title className="fw-bold">Tambah KRS</Modal.Title>
+    <Modal show={show} onHide={handleClose} centered backdrop="static" size="lg">
+      <Modal.Header closeButton className="bg-primary text-white">
+        <Modal.Title className="h5">Tambah KRS</Modal.Title>
       </Modal.Header>
-      <Form onSubmit={handleSave}>
-        <Modal.Body>
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>
-              Tahun <span className="text-danger">*</span>
+      <Form onSubmit={handleSubmit}>
+        <Modal.Body className="py-4">
+          <div className="row">
+            <div className="col-md-6 text-left">
+              <Form.Group className="mb-3">
+                <Form.Label className="font-weight-bold">
+                  Tahun Ajaran <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Select
+                  value={tahun}
+                  onChange={(e) => setTahun(e.target.value)}
+                  isInvalid={!!errors.tahun}
+                >
+                  <option value="">Pilih Tahun Ajaran</option>
+                  {tahunAjaran.map((item) => (
+                    <option key={item.id} value={item.tahun_ajaran}>
+                      {item.tahun_ajaran}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.tahun?.[0]}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </div>
+            <div className="col-md-6 text-left">
+              <Form.Group className="mb-3">
+                <Form.Label className="font-weight-bold">
+                  Semester <span className="text-danger">*</span>
+                </Form.Label>
+                <Form.Select
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
+                  isInvalid={!!errors.semester}
+                >
+                  <option value="">Pilih Semester</option>
+                  <option value="Awal / Juli - Desember">Awal / Juli - Desember</option>
+                  <option value="Akhir / Januari - Juni">Akhir / Januari - Juni</option>
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.semester?.[0]}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </div>
+          </div>
+
+          <Form.Group className="mb-0 text-left">
+            <Form.Label className="font-weight-bold">
+              File KRS <span className="text-danger">*</span>
             </Form.Label>
-            <Form.Select
-              aria-label="Default select example"
-              onChange={(e) => setTahun(e.target.value)}
-            >
-              <option value="">Pilih Tahun ...</option>
-              {tahunAjaran.map((data) => {
-                return (
-                  <option
-                    key={data.id}
-                    value={data.tahun_ajaran}
-                    defaultValue={tahun}
-                    selected={tahun == data.tahun_ajaran}
-                  >
-                    {data.tahun_ajaran}
-                  </option>
-                );
-              })}
-            </Form.Select>
-            {errors.tahun && (
-              <div className="text-danger">
-                {" "}
-                <small>{errors.tahun[0]}</small>{" "}
-              </div>
-            )}
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>
-              Semester <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Select
-              aria-label="Default select example"
-              onChange={(e) => setSemester(e.target.value)}
-            >
-              <option>Pilih Semester</option>
-              <option value="Awal / Juli - Desember">
-                Awal / Juli - Desember
-              </option>
-              <option value="Akhir / Januari - Juni">
-                Akhir / Januari - Juni
-              </option>
-            </Form.Select>
-            {errors.semester && (
-              <div className="text-danger">
-                {" "}
-                <small>{errors.semester[0]}</small>{" "}
-              </div>
-            )}
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>
-              KRS <span className="text-danger">*</span>
-            </Form.Label>
-            <input
+            <Form.Control
               type="file"
-              className="form-control"
+              accept=".jpg,.jpeg,.png,.pdf"
               onChange={(e) => setKrs(e.target.files[0])}
+              isInvalid={!!errors.krs}
             />
-            {errors.krs && (
-              <div className="text-danger">
-                {" "}
-                <small>{errors.krs[0]}</small>{" "}
-              </div>
-            )}
+            <Form.Text className="text-muted">
+              Format: JPG, PNG, PDF (Maks. 5MB)
+            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errors.krs?.[0]}
+            </Form.Control.Feedback>
           </Form.Group>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="warning" onClick={props.handleClose}>
-            <i class="fas fa-window-close"></i> Batal
+        <Modal.Footer className="bg-light">
+          <Button variant="secondary" onClick={handleClose} disabled={loading}>
+            Batal
           </Button>
-          <Button variant="primary" type="submit" disabled={loading}>
+          <Button variant="primary" type="submit" disabled={loading} className="px-4">
             {loading ? (
               <>
-                {" "}
-                <Spinner
-                  as="span"
-                  animation="grow"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                Loading...
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="mr-2" />
+                Mengunggah...
               </>
             ) : (
-              <>
-                <i class="fas fa-save"></i> Simpan
-              </>
+              "Simpan KRS"
             )}
           </Button>
         </Modal.Footer>

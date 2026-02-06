@@ -5,6 +5,7 @@ import useAuthContext from "../../../context/AuthContext"
 import { Row, Col, Card, Table, Form, Button, Badge, Spinner, Dropdown, Modal, InputGroup } from "react-bootstrap"
 import { CustomPagination } from "../../../components/custom-pagination"
 import toast from "react-hot-toast"
+import { Link } from "react-router-dom"
 
 const PelanggaranResidenManagement = () => {
   const { user } = useAuthContext()
@@ -386,28 +387,14 @@ const PelanggaranResidenManagement = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <Row className="w-100 align-items-center">
-            <Col>
-              <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Data Pelanggaran Residen</h1>
-              <p className="text-muted mt-1">Kelola data pelanggaran dan sanksi bagi residen.</p>
-            </Col>
-            <Col xs="auto">
-              <div className="d-flex gap-2">
-                <Badge bg="soft-primary" className="text-primary px-3 py-2 rounded-pill fw-bold mr-2">
-                  Total: {pagination.total}
-                </Badge>
-                <Button
-                  variant="primary"
-                  onClick={openAddModal}
-                  className="fw-bold shadow-sm px-4"
-                  style={{ borderRadius: '10px' }}
-                >
-                  <i className="fas fa-plus mr-2"></i> Tambah Data
-                </Button>
-              </div>
-            </Col>
-          </Row>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Data Pelanggaran Residen</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Data Pelanggaran Residen</div>
+          </div>
         </div>
 
         <div className="section-body mt-4">
@@ -418,15 +405,13 @@ const PelanggaranResidenManagement = () => {
                   <Col md={4}>
                     <Form.Label className="small fw-bold text-muted text-uppercase">Cari Pelanggaran / Residen</Form.Label>
                     <InputGroup className="bg-light border-0" style={{ borderRadius: '10px', overflow: 'hidden' }}>
-                      <InputGroup.Text className="bg-transparent border-0 text-muted">
-                        <i className="fas fa-search"></i>
-                      </InputGroup.Text>
+
                       <Form.Control
-                        className="bg-transparent border-0"
+
                         placeholder="Ketik kata kunci..."
                         value={term}
                         onChange={(e) => setTerm(e.target.value)}
-                        style={{ height: '45px' }}
+
                       />
                     </InputGroup>
                   </Col>
@@ -435,8 +420,7 @@ const PelanggaranResidenManagement = () => {
                     <Col md={3}>
                       <Form.Label className="small fw-bold text-muted text-uppercase">Program Studi</Form.Label>
                       <Form.Select
-                        className="bg-light border-0"
-                        style={{ borderRadius: '10px', height: '45px' }}
+
                         value={filters.prodi_id}
                         onChange={(e) => handleFilterChange("prodi_id", e.target.value)}
                       >
@@ -451,8 +435,7 @@ const PelanggaranResidenManagement = () => {
                   <Col md={isProdiUser ? 4 : 3}>
                     <Form.Label className="small fw-bold text-muted text-uppercase">Jenis Pelanggaran</Form.Label>
                     <Form.Select
-                      className="bg-light border-0"
-                      style={{ borderRadius: '10px', height: '45px' }}
+
                       value={filters.pelanggaran_id}
                       onChange={(e) => handleFilterChange("pelanggaran_id", e.target.value)}
                     >
@@ -469,7 +452,7 @@ const PelanggaranResidenManagement = () => {
                         variant="primary"
                         type="submit"
                         className="w-100 fw-bold shadow-sm mr-1"
-                        style={{ borderRadius: '10px', height: '45px' }}
+
                         disabled={loading}
                       >
                         {isSearching ? <Spinner size="sm" /> : 'Cari'}

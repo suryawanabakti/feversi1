@@ -8,7 +8,18 @@ import { Card, Form, InputGroup, Button, Table, Badge } from "react-bootstrap";
 import useAuthContext from "../../../../context/AuthContext";
 import "leaflet/dist/leaflet.css";
 
-// ... (marker icon fix remains same)
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const LaporanProvinsi = () => {
   const { user } = useAuthContext();
@@ -127,10 +138,13 @@ const LaporanProvinsi = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Sebaran Residen</h1>
-            <p className="text-muted mt-1">Statistik dan peta sebaran residen berdasarkan provinsi di Indonesia.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Sebaran Per Provinsi</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Sebaran Provinsi</div>
           </div>
         </div>
 
@@ -150,8 +164,8 @@ const LaporanProvinsi = () => {
                           <Form.Label className="text-dark small font-weight-bold mb-1">Program Studi</Form.Label>
                           <Form.Select
                             name="prodiId"
-                            className="border-0 bg-light"
-                            style={{ borderRadius: '10px', height: '45px' }}
+
+
                             value={filters.prodiId}
                             onChange={handleFilterChange}
                           >
@@ -168,8 +182,8 @@ const LaporanProvinsi = () => {
                         <Form.Label className="text-dark small font-weight-bold mb-1">Status Keanggotaan</Form.Label>
                         <Form.Select
                           name="status"
-                          className="border-0 bg-light"
-                          style={{ borderRadius: '10px', height: '45px' }}
+
+
                           value={filters.status}
                           onChange={handleFilterChange}
                         >
@@ -185,13 +199,13 @@ const LaporanProvinsi = () => {
           </Card>
 
           <div className="row">
-            <div className="col-lg-8">
-              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px' }}>
+            <div className="col-lg-12">
+              <Card className="border-0 shadow-sm overflow-hidden mb-4" style={{ borderRadius: '15px' }}>
                 <Card.Header className="bg-white border-bottom-0 py-3 px-4">
                   <h4 className="m-0 text-dark" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Peta Interaktif</h4>
                 </Card.Header>
                 <Card.Body className="p-0">
-                  <div style={{ height: "550px", width: "100%" }}>
+                  <div style={{ height: "650px", width: "100%" }}>
                     <MapContainer
                       center={[-0.789275, 113.921327]}
                       zoom={5}
@@ -228,8 +242,8 @@ const LaporanProvinsi = () => {
               </Card>
             </div>
 
-            <div className="col-lg-4">
-              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px', height: "614px" }}>
+            <div className="col-lg-12">
+              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px' }}>
                 <Card.Header className="bg-white border-bottom-0 py-3 px-4 d-flex justify-content-between align-items-center">
                   <h4 className="m-0 text-dark" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Data Wilayah</h4>
                 </Card.Header>
@@ -299,8 +313,9 @@ const LaporanProvinsi = () => {
             </div>
           </div>
         </div>
+
       </section>
-    </div>
+    </div >
   );
 };
 

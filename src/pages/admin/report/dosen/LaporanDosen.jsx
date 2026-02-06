@@ -107,9 +107,14 @@ export default function LaporanDosen() {
     <div className="main-content">
       {" "}
       <section className="section">
-        <div className="section-header d-flex justify-content-between">
-          <h1>Laporan Dosen</h1>
-          <b>Total : {dosens.countDosen}</b>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Laporan Data Dosen</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Laporan Dosen</div>
+          </div>
         </div>
         <div className="section-body">
           <div className="row">

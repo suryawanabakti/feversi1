@@ -6,6 +6,7 @@ import BeriRespon from "./BeriRespon"
 import { Dropdown, Card, Table, Form, Button, Badge, Spinner, InputGroup, Row, Col } from "react-bootstrap"
 import { CustomPagination } from "../../../components/custom-pagination"
 import InformasiInformasi from "../../../components/InformasiInformasi"
+import { Link } from "react-router-dom"
 
 const Informasi = () => {
   const [show, setShow] = useState(false)
@@ -116,18 +117,14 @@ const Informasi = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <Row className="w-100 align-items-center">
-            <Col>
-              <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Layanan Informasi</h1>
-              <p className="text-muted mt-1">Kelola permohonan informasi dari residen.</p>
-            </Col>
-            <Col xs="auto">
-              <Badge bg="soft-primary" className="text-primary px-3 py-2 rounded-pill fw-bold">
-                Total: {informasi.total}
-              </Badge>
-            </Col>
-          </Row>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Layanan Informasi</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Layanan Informasi</div>
+          </div>
         </div>
 
         <div className="section-body mt-4 text-left">
@@ -200,19 +197,7 @@ const Informasi = () => {
                         <tr key={item.id}>
                           <td className="px-4 py-3 border-light">
                             <div className="d-flex align-items-center">
-                              {item.user?.biodata?.pas_foto ? (
-                                <img
-                                  src={`${baseurl}/storage/pasfoto/${item.user.biodata.pas_foto}`}
-                                  className="rounded-circle mr-3 object-fit-cover shadow-sm"
-                                  width="45"
-                                  height="45"
-                                  alt={item.user.name}
-                                />
-                              ) : (
-                                <div className="rounded-circle mr-3 bg-soft-primary text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: 45, height: 45 }}>
-                                  {item.user?.name?.charAt(0)}
-                                </div>
-                              )}
+
                               <div>
                                 <div className="fw-bold text-dark">{item.user?.name}</div>
                                 <div className="small text-muted">{item.user?.username}</div>

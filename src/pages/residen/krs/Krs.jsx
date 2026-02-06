@@ -4,6 +4,8 @@ import { toast } from "react-hot-toast";
 import { Button, Spinner, Card } from "react-bootstrap";
 import Create from "./Create";
 import CustomTable from "../../../components/common/CustomTable";
+import { Link } from "react-router-dom";
+
 
 /**
  * KRS Page Component
@@ -92,8 +94,14 @@ const Krs = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header shadow-sm">
-          <h1>Kartu Rencana Studi</h1>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Kartu Rencana Studi</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">KRS</div>
+          </div>
         </div>
         <div className="section-body">
           <Card className="border-0 shadow-sm">

@@ -335,3 +335,48 @@
     margin-left: 0 !important;
   }
 }
+
+/* Premium Tab Styles */
+.biodata-tabs {
+  border: none !important;
+  margin-bottom: 2rem;
+  gap: 10px;
+}
+
+.biodata-tabs .nav-link {
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px;
+  font-weight: 600;
+  color: #6c757d;
+  background-color: #f1f5f9;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+}
+
+.biodata-tabs .nav-link i {
+  margin-right: 8px;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.biodata-tabs .nav-link:hover {
+  background-color: #e2e8f0;
+  color: #475569;
+  transform: translateY(-2px);
+}
+
+.biodata-tabs .nav-link.active {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+  box-shadow: 0 10px 15px -3px rgba(220, 53, 69, 0.3);
+}
+
+.biodata-tabs .nav-link.active i {
+  opacity: 1;
+}
+
+.tab-content {
+  animation: fadeIn 0.4s ease-out;
+}

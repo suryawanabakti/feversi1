@@ -3,6 +3,7 @@ import axios from "../../../api/axios";
 import { toast } from "react-hot-toast";
 import baseurl from "../../../api/baseurl";
 import { CustomPagination } from "../../../components/custom-pagination";
+import { Link } from "react-router-dom";
 import { Card, Table, Form, InputGroup, Button, Badge, Spinner } from "react-bootstrap";
 
 export default function StrSip() {
@@ -13,6 +14,25 @@ export default function StrSip() {
   const [activePage, setActivePage] = useState(1);
   const [totalItem, setTotalItem] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const handleViewDocument = async (e, filePath, fileUrl) => {
+    e.preventDefault();
+    if (!fileUrl) return;
+    const toastId = toast.loading("Membuka dokumen...");
+    try {
+      const response = await axios.get(`/api/documents/${filePath}/${fileUrl}`, {
+        responseType: "blob",
+      });
+      const file = new Blob([response.data], { type: response.headers["content-type"] });
+      const fileURL = URL.createObjectURL(file);
+      window.open(fileURL, "_blank");
+      toast.dismiss(toastId);
+    } catch (error) {
+      console.error(error);
+      toast.dismiss(toastId);
+      toast.error("Gagal membuka dokumen. Anda mungkin tidak memiliki akses.");
+    }
+  };
 
   const getProdiOptions = async () => {
     try {
@@ -61,10 +81,13 @@ export default function StrSip() {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Dokumen Residen</h1>
-            <p className="text-muted mt-1">Daftar STR, SIP, Ijazah, dan Pas Foto residen aktif.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Dokumen Residen</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Dokumen Residen</div>
           </div>
         </div>
 
@@ -81,13 +104,11 @@ export default function StrSip() {
                     <div className="row g-3">
                       <div className="col-md-5">
                         <InputGroup>
-                          <InputGroup.Text className="bg-light border-0">
-                            <i className="fas fa-search text-muted"></i>
-                          </InputGroup.Text>
+
                           <Form.Control
-                            className="bg-light border-0"
+
                             placeholder="Cari Nama / NIM..."
-                            style={{ borderRadius: '0 10px 10px 0', height: '45px' }}
+
                             value={term}
                             onChange={(e) => setTerm(e.target.value)}
                           />
@@ -95,7 +116,7 @@ export default function StrSip() {
                       </div>
                       <div className="col-md-4">
                         <Form.Select
-                          className="bg-light border-0"
+
                           style={{ borderRadius: '10px', height: '45px' }}
                           value={prodiId}
                           onChange={handleProdiChange}
@@ -163,9 +184,8 @@ export default function StrSip() {
                           <td className="px-4 py-3 border-light text-center">
                             {data.biodata?.str ? (
                               <a
-                                href={`${baseurl}/storage/str/${data.biodata.str}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
+                                onClick={(e) => handleViewDocument(e, "str", data.biodata.str)}
                                 className="btn btn-sm btn-soft-primary px-3 text-primary"
                                 style={{ borderRadius: '6px', fontWeight: 600 }}
                               >
@@ -178,9 +198,8 @@ export default function StrSip() {
                           <td className="px-4 py-3 border-light text-center">
                             {data.biodata?.sip ? (
                               <a
-                                href={`${baseurl}/storage/sip/${data.biodata.sip}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
+                                onClick={(e) => handleViewDocument(e, "sip", data.biodata.sip)}
                                 className="btn btn-sm btn-soft-primary px-3 text-primary"
                                 style={{ borderRadius: '6px', fontWeight: 600 }}
                               >
@@ -193,9 +212,8 @@ export default function StrSip() {
                           <td className="px-4 py-3 border-light text-center">
                             {data.biodata?.ijazah_terakhir ? (
                               <a
-                                href={`${baseurl}/storage/ijazahterakhir/${data.biodata.ijazah_terakhir}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href="#"
+                                onClick={(e) => handleViewDocument(e, "ijazahterakhir", data.biodata.ijazah_terakhir)}
                                 className="btn btn-sm btn-soft-info px-3 text-info"
                                 style={{ borderRadius: '6px', fontWeight: 600 }}
                               >
@@ -208,12 +226,12 @@ export default function StrSip() {
                           <td className="px-4 py-3 border-light text-center">
                             {data.biodata?.pas_foto ? (
                               <a
-                                href={`${baseurl}/storage/pasfoto/${data.biodata.pas_foto}`}
-                                download
+                                href="#"
+                                onClick={(e) => handleViewDocument(e, "pasfoto", data.biodata.pas_foto)}
                                 className="btn btn-sm btn-soft-success px-3 text-success"
                                 style={{ borderRadius: '6px', fontWeight: 600 }}
                               >
-                                <i className="fas fa-download mr-1"></i> Foto
+                                <i className="fas fa-eye mr-1"></i> Foto
                               </a>
                             ) : (
                               <Badge bg="soft-danger" className="text-danger fw-normal">Belum ada</Badge>

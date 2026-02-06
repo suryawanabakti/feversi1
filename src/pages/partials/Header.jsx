@@ -208,7 +208,6 @@ const Header = () => {
                     </div>
                   </a>
                   <div className="dropdown-menu dropdown-menu-right">
-                    Role : {user?.roles?.[0]?.name}
 
                     <Link
                       to="/change-password"

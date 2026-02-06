@@ -86,8 +86,14 @@ export default function LaporanProdi() {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header">
-          <h1>Laporan Prodi</h1>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Laporan Per Program Studi</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Laporan Prodi</div>
+          </div>
         </div>
         <div className="section-body">
           <div className="row">

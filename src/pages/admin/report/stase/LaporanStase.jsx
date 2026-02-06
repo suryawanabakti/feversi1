@@ -118,27 +118,12 @@ export default function LaporanStase() {
       <section className="section">
         {/* Header Section */}
         <div className="section-header d-flex justify-content-between align-items-center">
-          <div>
-            <h1 className="mb-2">
-              <i className="fas fa-chart-bar text-primary me-2"></i>
-              Laporan Stase
-            </h1>
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb bg-transparent mb-0 pb-0">
-                <li className="breadcrumb-item">
-                  <Link to="/dashboard">Dashboard</Link>
-                </li>
-                <li className="breadcrumb-item active" aria-current="page">
-                  Laporan Stase
-                </li>
-              </ol>
-            </nav>
-          </div>
-          <div className="d-flex gap-2">
-            <Badge bg="info" className="fs-6">
-              <i className="fas fa-user me-1"></i>
-              {user.name}
-            </Badge>
+          <h1 className="font-weight-bold">Laporan Stase</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Laporan Stase</div>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 import baseurl from "../../../api/baseurl";
 import { CustomPagination } from "../../../components/custom-pagination";
 import { Card, Table, Form, InputGroup, Button, Badge, Spinner } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 export default function Prestasi() {
   const [prestasi, setPrestasi] = useState([]);
@@ -65,10 +66,13 @@ export default function Prestasi() {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Prestasi Residen</h1>
-            <p className="text-muted mt-1">Daftar pencapaian dan prestasi residen aktif maupun alumni.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Prestasi Residen</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Prestasi Residen</div>
           </div>
         </div>
 
@@ -85,11 +89,9 @@ export default function Prestasi() {
                     <div className="row g-3">
                       <div className="col-md-5">
                         <InputGroup>
-                          <InputGroup.Text className="bg-light border-0">
-                            <i className="fas fa-search text-muted"></i>
-                          </InputGroup.Text>
+
                           <Form.Control
-                            className="bg-light border-0"
+
                             placeholder="Cari Nama / NIM / Prestasi..."
                             style={{ borderRadius: '0 10px 10px 0', height: '45px' }}
                             value={term}
@@ -99,8 +101,7 @@ export default function Prestasi() {
                       </div>
                       <div className="col-md-4">
                         <Form.Select
-                          className="bg-light border-0"
-                          style={{ borderRadius: '10px', height: '45px' }}
+
                           value={prodiId}
                           onChange={handleProdiChange}
                         >

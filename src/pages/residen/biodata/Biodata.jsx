@@ -5,8 +5,9 @@ import { toast } from "react-hot-toast"
 import axios from "../../../api/axios"
 import baseurl from "../../../api/baseurl"
 import useAuthContext from "../../../context/AuthContext"
-import { Spinner, Tooltip, OverlayTrigger } from "react-bootstrap"
+import { Spinner, Tooltip, OverlayTrigger, Row, Col, Card, Form, Tabs, Tab } from "react-bootstrap"
 import "./biodata-style.css"
+import { Link } from "react-router-dom"
 const Biodata = () => {
   // Context and state
   const { user, getUser } = useAuthContext()
@@ -602,15 +603,21 @@ const Biodata = () => {
       nomorRekening && formData.append("noRekening", nomorRekening)
       npwp && formData.append("npwp", npwp)
       email && formData.append("email", email)
-      formData.append("rekomendasiAsal", rekomendasiAsal)
+      formData.append("rekomendasiAsal", rekomendasiAsal || "-")
       asalFk && formData.append("asalFk", asalFk)
       akreditasi && formData.append("akreditasi", akreditasi)
       tempatKerjaSebelumnya && formData.append("tempatKerjaSebelumnya", tempatKerjaSebelumnya)
       statusPembiayaan && formData.append("statusPembiayaan", statusPembiayaan)
-      beasiswa && formData.append("beasiswa", beasiswa)
-      beasiswaDll && formData.append("beasiswaDll", beasiswaDll)
+
+      // Scholarship data (send even if empty strings to satisfy backend keys)
+      if (statusPembiayaan === "beasiswa") {
+        formData.append("beasiswa", beasiswa || "-")
+        formData.append("beasiswaDll", beasiswaDll || "-")
+      }
+
       provinsi && formData.append("provinsiId", provinsi)
       kabupaten && formData.append("kabupatenId", kabupaten)
+      kecamatan && formData.append("kecamatanId", kecamatan)
 
       // Document files
       ktp && formData.append("ktp", ktp)
@@ -715,875 +722,730 @@ const Biodata = () => {
           <h1 className="font-weight-bold">Biodata</h1>
           <div className="section-header-breadcrumb">
             <div className="breadcrumb-item">
-              <a href="/dashboard">Dashboard</a>
+              <Link to="/dashboard">Dashboard</Link>
             </div>
             <div className="breadcrumb-item active">Biodata</div>
           </div>
         </div>
 
         <div className="section-body">
-          <div className="row">
-            <div className="col-12">
-              <div className="card shadow-sm">
-                <div className="card-header bg-white">
-                  <h4 className="card-title mb-0">
-                    <i className="fas fa-user-circle mr-2"></i>
-                    Formulir Biodata
-                  </h4>
-                </div>
-                <div className="card-body">
-                  {formLoading ? (
-                    <div className="text-center py-5">
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="sr-only">Loading...</span>
-                      </div>
-                      <p className="mt-2">Memuat data biodata...</p>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleSave}>
-                      <div className="row">
-                        <div className="col-md-12 mb-4">
-                          <div className="alert alert-info">
-                            <i className="fas fa-info-circle mr-2"></i>
-                            Silakan lengkapi biodata Anda dengan teliti. Kolom bertanda{" "}
-                            <span className="text-danger">*</span> wajib diisi.
-                          </div>
-                        </div>
-
-                        {/* Personal Information Section */}
-                        <div className="col-md-12 mb-4">
-                          <h5 className="section-title">
-                            <i className="fas fa-user mr-2"></i>
-                            Informasi Pribadi
-                          </h5>
-                          <hr />
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="name" className="form-label">
-                              Nama Lengkap <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              id="name"
-                              placeholder="Masukkan Nama Lengkap..."
-                              onChange={(e) => setName(e.target.value)}
-                              className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                              value={name}
-                            />
-                            {errors.name && <div className="invalid-feedback">{errors.name[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="nim" className="form-label">
-                              NIM <span className="text-danger">*</span>
-                            </label>
-                            <input type="text" id="nim" className="form-control" readOnly value={user.username} />
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="prodi" className="form-label">
-                              Program Studi <span className="text-danger">*</span>
-                            </label>
-                            <input type="text" id="prodi" className="form-control" value={placeholderProdi} readOnly />
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label className="form-label">
-                              Jenis Kelamin <span className="text-danger">*</span>
-                            </label>
-                            <div className="d-flex">
-                              <div className="custom-control custom-radio mr-4">
-                                <input
-                                  type="radio"
-                                  id="laki-laki"
-                                  name="jenisKelamin"
-                                  className="custom-control-input"
-                                  onClick={() => setJenisKelamin("laki-laki")}
-                                  checked={jenisKelamin === "laki-laki"}
-                                  onChange={() => { }}
-                                />
-                                <label className="custom-control-label" htmlFor="laki-laki">
-                                  Laki-laki
-                                </label>
-                              </div>
-                              <div className="custom-control custom-radio">
-                                <input
-                                  type="radio"
-                                  id="perempuan"
-                                  name="jenisKelamin"
-                                  className="custom-control-input"
-                                  onClick={() => setJenisKelamin("perempuan")}
-                                  checked={jenisKelamin === "perempuan"}
-                                  onChange={() => { }}
-                                />
-                                <label className="custom-control-label" htmlFor="perempuan">
-                                  Perempuan
-                                </label>
-                              </div>
-                            </div>
-                            {errors.jenisKelamin && (
-                              <div className="text-danger small mt-1">{errors.jenisKelamin[0]}</div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="tahunMasuk" className="form-label">
-                              Tahun Masuk <span className="text-danger">*</span>
-                            </label>
-                            <select
-                              id="tahunMasuk"
-                              className={`form-control custom-select ${errors.tahunMasuk ? "is-invalid" : ""}`}
-                              onChange={(e) => setTahunMasuk(e.target.value)}
-                              value={tahunMasuk}
-                            >
-                              <option value="">Pilih Tahun...</option>
-                              {tahunAjaran.map((data) => (
-                                <option key={data.id} value={data.tahun_ajaran}>
-                                  {data.tahun_ajaran}
-                                </option>
-                              ))}
-                            </select>
-                            {errors.tahunMasuk && <div className="invalid-feedback">{errors.tahunMasuk[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="semester" className="form-label">
-                              Semester <span className="text-danger">*</span>
-                            </label>
-                            <select
-                              id="semester"
-                              className={`form-control custom-select ${errors.semester ? "is-invalid" : ""}`}
-                              onChange={(e) => setSemester(e.target.value)}
-                              value={semester}
-                            >
-                              <option value="">Pilih Semester...</option>
-                              <option value="Awal / Juli - Desember">Awal / Juli - Desember</option>
-                              <option value="Akhir / Januari - Juni">Akhir / Januari - Juni</option>
-                            </select>
-                            {errors.semester && <div className="invalid-feedback">{errors.semester[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="tanggalLahir" className="form-label">
-                              Tanggal Lahir <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="date"
-                              id="tanggalLahir"
-                              className={`form-control ${errors.tanggalLahir ? "is-invalid" : ""}`}
-                              value={tanggalLahir}
-                              onChange={(e) => setTanggalLahir(e.target.value)}
-                            />
-                            {errors.tanggalLahir && <div className="invalid-feedback">{errors.tanggalLahir[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="nomorHp" className="form-label">
-                              Nomor HP <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="number"
-                              id="nomorHp"
-                              placeholder="Masukkan Nomor HP..."
-                              className={`form-control ${errors.noHp ? "is-invalid" : ""}`}
-                              value={nomorHp}
-                              onChange={(e) => setNomorHp(e.target.value)}
-                            />
-                            {errors.noHp && <div className="invalid-feedback">{errors.noHp[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="email" className="form-label">
-                              Email
-                            </label>
-                            <input
-                              type="email"
-                              id="email"
-                              value={email}
-                              placeholder="Masukkan Email..."
-                              className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                              onChange={(e) => setEmail(e.target.value)}
-                            />
-                            {errors.email && <div className="invalid-feedback">{errors.email[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="nik" className="form-label">
-                              NIK <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="number"
-                              id="nik"
-                              placeholder="Masukkan NIK..."
-                              className={`form-control ${errors.nik ? "is-invalid" : ""}`}
-                              value={nik}
-                              onChange={(e) => setNik(e.target.value)}
-                            />
-                            {errors.nik && <div className="invalid-feedback">{errors.nik[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="npwp" className="form-label">
-                              NPWP
-                            </label>
-                            <input
-                              type="text"
-                              id="npwp"
-                              className={`form-control ${errors.npwp ? "is-invalid" : ""}`}
-                              value={npwp}
-                              placeholder="Masukkan NPWP..."
-                              onChange={(e) => setNpwp(e.target.value)}
-                            />
-                            {errors.npwp && <div className="invalid-feedback">{errors.npwp[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="nomorRekening" className="form-label">
-                              Nomor Rekening
-                            </label>
-                            <input
-                              type="text"
-                              id="nomorRekening"
-                              placeholder="Masukkan Nomor Rekening..."
-                              className={`form-control ${errors.noRekening ? "is-invalid" : ""}`}
-                              value={nomorRekening}
-                              onChange={(e) => setNomorRekening(e.target.value)}
-                            />
-                            {errors.noRekening && <div className="invalid-feedback">{errors.noRekening[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-12">
-                          <div className="form-group">
-                            <label htmlFor="alamat" className="form-label">
-                              Alamat <span className="text-danger">*</span>
-                            </label>
-                            <textarea
-                              id="alamat"
-                              onChange={(e) => setAlamat(e.target.value)}
-                              placeholder="Masukkan Alamat..."
-                              value={alamat}
-                              rows="4"
-                              className={`form-control ${errors.alamat ? "is-invalid" : ""}`}
-                            ></textarea>
-                            {errors.alamat && <div className="invalid-feedback">{errors.alamat[0]}</div>}
-                          </div>
-                        </div>
-
-                        {/* Education Information Section */}
-                        <div className="col-md-12 mb-4 mt-4">
-                          <h5 className="section-title">
-                            <i className="fas fa-graduation-cap mr-2"></i>
-                            Informasi Pendidikan
-                          </h5>
-                          <hr />
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="asalFk" className="form-label">
-                              Asal Fakultas Kedokteran <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              id="asalFk"
-                              className={`form-control ${errors.asalFk ? "is-invalid" : ""}`}
-                              value={asalFk}
-                              placeholder="Masukkan Asal FK..."
-                              onChange={(e) => setAsalFk(e.target.value)}
-                            />
-                            {errors.asalFk && <div className="invalid-feedback">{errors.asalFk[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="akreditasi" className="form-label">
-                              Akreditasi <span className="text-danger">*</span>
-                            </label>
-                            <select
-                              id="akreditasi"
-                              className={`form-control custom-select ${errors.akreditasi ? "is-invalid" : ""}`}
-                              onChange={(e) => setAkreditasi(e.target.value)}
-                              value={akreditasi}
-                            >
-                              <option value="">Pilih Akreditasi</option>
-                              <option value="A">A</option>
-                              <option value="B">B</option>
-                              <option value="C">C</option>
-                              <option value="D">D</option>
-                            </select>
-                            {errors.akreditasi && <div className="invalid-feedback">{errors.akreditasi[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="ipk" className="form-label">
-                              IPK <span className="text-danger">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              id="ipk"
-                              className={`form-control ${errors.ipk ? "is-invalid" : ""}`}
-                              value={ipk}
-                              placeholder="0.00"
-                              onChange={(e) => setIpk(e.target.value)}
-                            />
-                            {errors.ipk && <div className="invalid-feedback">{errors.ipk[0]}</div>}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="tempatKerjaSebelumnya" className="form-label">
-                              Tempat Kerja Sebelumnya
-                            </label>
-                            <input
-                              type="text"
-                              id="tempatKerjaSebelumnya"
-                              className={`form-control ${errors.tempatKerjaSebelumnya ? "is-invalid" : ""}`}
-                              value={tempatKerjaSebelumnya}
-                              placeholder="Masukkan tempat kerja sebelumnya..."
-                              onChange={(e) => setTempatKerjaSebelumnya(e.target.value)}
-                            />
-                            {errors.tempatKerjaSebelumnya && (
-                              <div className="invalid-feedback">{errors.tempatKerjaSebelumnya[0]}</div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="col-md-12">
-                          <div className="form-group">
-                            <label className="form-label">
-                              Rekomendasi Asal <span className="text-danger">*</span>
-                            </label>
-                            <div className="row">
-                              <div className="col-md-6">
-                                <select
-                                  name="provinsi"
-                                  id="provinsi"
-                                  className={`form-control custom-select mb-2 ${errors.provinsiId ? "is-invalid" : ""}`}
-                                  onChange={(e) => handleChangeProvinsi(e.target.value)}
-                                  value={provinsi || ""}
-                                >
-                                  <option value="">{namaPropinsi ? namaPropinsi : "Pilih Provinsi"}</option>
-                                  {dataProvinsi.map((data) => (
-                                    <option value={data.id} key={data.id}>
-                                      {data.nama}
-                                    </option>
-                                  ))}
-                                </select>
-                                {errors.provinsiId && <div className="invalid-feedback">{errors.provinsiId[0]}</div>}
-                              </div>
-                              <div className="col-md-6">
-                                <select
-                                  name="kabupaten"
-                                  id="kabupaten"
-                                  className={`form-control custom-select ${errors.kabupatenId ? "is-invalid" : ""}`}
-                                  onChange={(e) => handleChangeKabupaten(e.target.value)}
-                                  value={kabupaten || ""}
-                                >
-                                  <option id="kabupatenUbah" value="">
-                                    {namaKabupaten ? namaKabupaten : "Pilih Kabupaten"}
-                                  </option>
-                                  {dataKabupaten.map((data) => (
-                                    <option value={data.id} key={data.id}>
-                                      {data.nama}
-                                    </option>
-                                  ))}
-                                </select>
-                                {errors.kabupatenId && <div className="invalid-feedback">{errors.kabupatenId[0]}</div>}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Financing Information Section */}
-                        <div className="col-md-12 mb-4 mt-4">
-                          <h5 className="section-title">
-                            <i className="fas fa-money-bill-wave mr-2"></i>
-                            Informasi Pembiayaan
-                          </h5>
-                          <hr />
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="statusPembiayaan" className="form-label">
-                              Status Pembiayaan <span className="text-danger">*</span>
-                            </label>
-                            <select
-                              id="statusPembiayaan"
-                              className={`form-control custom-select ${errors.statusPembiayaan ? "is-invalid" : ""}`}
-                              value={statusPembiayaan}
-                              onChange={handleStatusPembiayaan}
-                            >
-                              <option value="">Pilih Status Pembiayaan</option>
-                              <option value="mandiri">Mandiri</option>
-                              <option value="beasiswa">Beasiswa</option>
-                              <option value="swasta">Swasta</option>
-                            </select>
-                            {errors.statusPembiayaan && (
-                              <div className="invalid-feedback">{errors.statusPembiayaan[0]}</div>
-                            )}
-                          </div>
-                        </div>
-
-                        {inputBeasiswa && (
-                          <div className="col-md-6">
-                            <div className="form-group">
-                              <label htmlFor="beasiswa" className="form-label">
-                                Beasiswa <span className="text-danger">*</span>
-                              </label>
-                              <select
-                                id="beasiswa"
-                                className={`form-control custom-select ${errors.beasiswa ? "is-invalid" : ""}`}
-                                value={beasiswa}
-                                onChange={(e) => setBeasiswa(e.target.value)}
-                              >
-                                <option value="Kemkes">Kemkes</option>
-                                <option value="LPDP">LPDP</option>
-                                <option value="Pemda">Pemda</option>
-                                <option value="TNI">TNI</option>
-                                <option value="POLRI">POLRI</option>
-                                <option value="Dan Lain-lain">Dan Lain-lain</option>
-                              </select>
-                              {errors.beasiswa && <div className="invalid-feedback">{errors.beasiswa[0]}</div>}
-                            </div>
-                          </div>
-                        )}
-
-                        {beasiswa === "Dan Lain-lain" && (
-                          <div className="col-md-6">
-                            <div className="form-group">
-                              <label htmlFor="beasiswaDll" className="form-label">
-                                Beasiswa Lain-lain
-                              </label>
-                              <input
+          {formLoading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="mt-2">Memuat data biodata...</p>
+            </div>
+          ) : (
+            <Form onSubmit={handleSave}>
+              <div className="row">
+                {/* Informasi Pribadi Section */}
+                <Row className="mb-5 align-items-start">
+                  <Col lg={4} className="mb-4">
+                    <h5 className="font-weight-bold text-dark" style={{ fontSize: '1.25rem' }}>
+                      <i className="fas fa-user mr-2 text-primary opacity-50"></i>
+                      Informasi Pribadi
+                    </h5>
+                    <p className="text-muted small">Detail identitas diri Anda yang terdaftar pada sistem.</p>
+                  </Col>
+                  <Col lg={8}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
+                      <Card.Body className="p-4">
+                        <Row className="g-4">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Nama Lengkap <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Control
                                 type="text"
-                                id="beasiswaDll"
-                                className="form-control"
-                                value={beasiswaDll}
-                                onChange={(e) => setBeasiswaDll(e.target.value)}
+                                placeholder="Masukkan Nama Lengkap..."
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                isInvalid={!!errors.name}
+                                style={{ borderRadius: '10px', height: '48px' }}
                               />
-                            </div>
-                          </div>
-                        )}
+                              <Form.Control.Feedback type="invalid">{errors.name?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        {/* Document Upload Section */}
-                        <div className="col-md-12 mb-4 mt-4">
-                          <h5 className="section-title">
-                            <i className="fas fa-file-upload mr-2"></i>
-                            Dokumen
-                          </h5>
-                          <hr />
-                        </div>
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">NIM</Form.Label>
+                              <Form.Control
+                                type="text"
+                                readOnly
+                                value={user.username}
+                                style={{ borderRadius: '10px', height: '48px', backgroundColor: '#f8fafc' }}
+                              />
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="ktp" className="form-label">
-                              <DocumentPreview label="KTP" filePath="ktp" fileUrl={ktpPrev2} required={true} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Program Studi</Form.Label>
+                              <Form.Control
+                                type="text"
+                                readOnly
+                                value={placeholderProdi}
+                                style={{ borderRadius: '10px', height: '48px', backgroundColor: '#f8fafc' }}
+                              />
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Jenis Kelamin <span className="text-danger">*</span></Form.Label>
+                              <div className="d-flex mt-2">
+                                <Form.Check
+                                  type="radio"
+                                  label="Laki-laki"
+                                  name="jenisKelamin"
+                                  id="laki-laki"
+                                  className="mr-4"
+                                  checked={jenisKelamin === "laki-laki"}
+                                  onChange={() => setJenisKelamin("laki-laki")}
+                                />
+                                <Form.Check
+                                  type="radio"
+                                  label="Perempuan"
+                                  name="jenisKelamin"
+                                  id="perempuan"
+                                  checked={jenisKelamin === "perempuan"}
+                                  onChange={() => setJenisKelamin("perempuan")}
+                                />
+                              </div>
+                              {errors.jenisKelamin && <div className="text-danger small mt-2">{errors.jenisKelamin[0]}</div>}
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Tahun Masuk <span className="text-danger">*</span></Form.Label>
+                              <Form.Select
+                                value={tahunMasuk}
+                                onChange={(e) => setTahunMasuk(e.target.value)}
+                                isInvalid={!!errors.tahunMasuk}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              >
+                                <option value="">Pilih Tahun...</option>
+                                {tahunAjaran.map((data) => (
+                                  <option key={data.id} value={data.tahun_ajaran}>{data.tahun_ajaran}</option>
+                                ))}
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">{errors.tahunMasuk?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Semester <span className="text-danger">*</span></Form.Label>
+                              <Form.Select
+                                value={semester}
+                                onChange={(e) => setSemester(e.target.value)}
+                                isInvalid={!!errors.semester}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              >
+                                <option value="">Pilih Semester...</option>
+                                <option value="Awal / Juli - Desember">Awal / Juli - Desember</option>
+                                <option value="Akhir / Januari - Juni">Akhir / Januari - Juni</option>
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">{errors.semester?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Tanggal Lahir <span className="text-danger">*</span></Form.Label>
+                              <Form.Control
+                                type="date"
+                                value={tanggalLahir}
+                                onChange={(e) => setTanggalLahir(e.target.value)}
+                                isInvalid={!!errors.tanggalLahir}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.tanggalLahir?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Nomor HP <span className="text-danger">*</span></Form.Label>
+                              <Form.Control
+                                type="number"
+                                placeholder="08..."
+                                value={nomorHp}
+                                onChange={(e) => setNomorHp(e.target.value)}
+                                isInvalid={!!errors.noHp}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.noHp?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Email</Form.Label>
+                              <Form.Control
+                                type="email"
+                                placeholder="example@mail.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                isInvalid={!!errors.email}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.email?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">NIK <span className="text-danger">*</span></Form.Label>
+                              <Form.Control
+                                type="number"
+                                placeholder="Masukkan NIK..."
+                                value={nik}
+                                onChange={(e) => setNik(e.target.value)}
+                                isInvalid={!!errors.nik}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.nik?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">NPWP</Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="XX.XXX.XXX.X-XXX.XXX"
+                                value={npwp}
+                                onChange={(e) => setNpwp(e.target.value)}
+                                isInvalid={!!errors.npwp}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.npwp?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Nomor Rekening</Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="Masukkan Nomor Rekening..."
+                                value={nomorRekening}
+                                onChange={(e) => setNomorRekening(e.target.value)}
+                                isInvalid={!!errors.noRekening}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.noRekening?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={12}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">Alamat <span className="text-danger">*</span></Form.Label>
+                              <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="Alamat domisili lengkap..."
+                                value={alamat}
+                                onChange={(e) => setAlamat(e.target.value)}
+                                isInvalid={!!errors.alamat}
+                                style={{ borderRadius: '10px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.alamat?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+
+                {/* Informasi Pendidikan Section */}
+                <Row className="mb-5 align-items-start">
+                  <Col lg={4} className="mb-4">
+                    <h5 className="font-weight-bold text-dark" style={{ fontSize: '1.25rem' }}>
+                      <i className="fas fa-graduation-cap mr-2 text-primary opacity-50"></i>
+                      Informasi Pendidikan
+                    </h5>
+                    <p className="text-muted small">Riwayat latar belakang pendidikan dan rekomendasi daerah.</p>
+                  </Col>
+                  <Col lg={8}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
+                      <Card.Body className="p-4">
+                        <Row className="g-4">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Asal Fakultas Kedokteran <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="Masukkan Asal FK..."
+                                value={asalFk}
+                                onChange={(e) => setAsalFk(e.target.value)}
+                                isInvalid={!!errors.asalFk}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.asalFk?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Akreditasi <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Select
+                                value={akreditasi}
+                                onChange={(e) => setAkreditasi(e.target.value)}
+                                isInvalid={!!errors.akreditasi}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              >
+                                <option value="">Pilih Akreditasi</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">{errors.akreditasi?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                IPK <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="0.00"
+                                value={ipk}
+                                onChange={(e) => setIpk(e.target.value)}
+                                isInvalid={!!errors.ipk}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.ipk?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Tempat Kerja Sebelumnya
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                placeholder="Masukkan tempat kerja sebelumnya..."
+                                value={tempatKerjaSebelumnya}
+                                onChange={(e) => setTempatKerjaSebelumnya(e.target.value)}
+                                isInvalid={!!errors.tempatKerjaSebelumnya}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              />
+                              <Form.Control.Feedback type="invalid">{errors.tempatKerjaSebelumnya?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={12}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Rekomendasi Asal <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Row className="g-3">
+                                <Col md={6}>
+                                  <Form.Select
+                                    className="mb-2"
+                                    onChange={(e) => handleChangeProvinsi(e.target.value)}
+                                    value={provinsi || ""}
+                                    isInvalid={!!errors.provinsiId}
+                                    style={{ borderRadius: '10px', height: '48px' }}
+                                  >
+                                    <option value="">{namaPropinsi ? namaPropinsi : "Pilih Provinsi"}</option>
+                                    {dataProvinsi.map((data) => (
+                                      <option value={data.id} key={data.id}>{data.nama}</option>
+                                    ))}
+                                  </Form.Select>
+                                  <Form.Control.Feedback type="invalid">{errors.provinsiId?.[0]}</Form.Control.Feedback>
+                                </Col>
+                                <Col md={6}>
+                                  <Form.Select
+                                    onChange={(e) => handleChangeKabupaten(e.target.value)}
+                                    value={kabupaten || ""}
+                                    isInvalid={!!errors.kabupatenId}
+                                    style={{ borderRadius: '10px', height: '48px' }}
+                                  >
+                                    <option value="" id="kabupatenUbah">{namaKabupaten ? namaKabupaten : "Pilih Kabupaten"}</option>
+                                    {dataKabupaten.map((data) => (
+                                      <option value={data.id} key={data.id}>{data.nama}</option>
+                                    ))}
+                                  </Form.Select>
+                                  <Form.Control.Feedback type="invalid">{errors.kabupatenId?.[0]}</Form.Control.Feedback>
+                                </Col>
+                              </Row>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+
+                {/* Informasi Pembiayaan Section */}
+                <Row className="mb-5 align-items-start">
+                  <Col lg={4} className="mb-4">
+                    <h5 className="font-weight-bold text-dark" style={{ fontSize: '1.25rem' }}>
+                      <i className="fas fa-money-bill-wave mr-2 text-primary opacity-50"></i>
+                      Informasi Pembiayaan
+                    </h5>
+                    <p className="text-muted small">Detail mengenai status pembiayaan dan beasiswa (jika ada).</p>
+                  </Col>
+                  <Col lg={8}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
+                      <Card.Body className="p-4">
+                        <Row className="g-4">
+                          <Col md={inputBeasiswa ? 6 : 12}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                Status Pembiayaan <span className="text-danger">*</span>
+                              </Form.Label>
+                              <Form.Select
+                                value={statusPembiayaan}
+                                onChange={handleStatusPembiayaan}
+                                isInvalid={!!errors.statusPembiayaan}
+                                style={{ borderRadius: '10px', height: '48px' }}
+                              >
+                                <option value="">Pilih Status Pembiayaan</option>
+                                <option value="mandiri">Mandiri</option>
+                                <option value="beasiswa">Beasiswa</option>
+                                <option value="swasta">Swasta</option>
+                              </Form.Select>
+                              <Form.Control.Feedback type="invalid">{errors.statusPembiayaan?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+
+                          {inputBeasiswa && (
+                            <Col md={6}>
+                              <Form.Group>
+                                <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                  Beasiswa <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Select
+                                  value={beasiswa}
+                                  onChange={(e) => setBeasiswa(e.target.value)}
+                                  isInvalid={!!errors.beasiswa}
+                                  style={{ borderRadius: '10px', height: '48px' }}
+                                >
+                                  <option value="">Pilih Beasiswa...</option>
+                                  <option value="Kemkes">Kemkes</option>
+                                  <option value="LPDP">LPDP</option>
+                                  <option value="Pemda">Pemda</option>
+                                  <option value="TNI">TNI</option>
+                                  <option value="POLRI">POLRI</option>
+                                  <option value="Dan Lain-lain">Dan Lain-lain</option>
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">{errors.beasiswa?.[0]}</Form.Control.Feedback>
+                              </Form.Group>
+                            </Col>
+                          )}
+
+                          {beasiswa === "Dan Lain-lain" && (
+                            <Col md={12}>
+                              <Form.Group>
+                                <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                  Beasiswa Lain-lain
+                                </Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  placeholder="Sebutkan Beasiswa Lainnya..."
+                                  value={beasiswaDll}
+                                  onChange={(e) => setBeasiswaDll(e.target.value)}
+                                  style={{ borderRadius: '10px', height: '48px' }}
+                                />
+                              </Form.Group>
+                            </Col>
+                          )}
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
+
+                {/* Dokumen Section */}
+                <Row className="mb-5 align-items-start">
+                  <Col lg={4} className="mb-4">
+                    <h5 className="font-weight-bold text-dark" style={{ fontSize: '1.25rem' }}>
+                      <i className="fas fa-file-upload mr-2 text-primary opacity-50"></i>
+                      Dokumen Lampiran
+                    </h5>
+                    <p className="text-muted small">Unggah dokumen pendukung dalam format PDF atau Gambar (maks. 2MB).</p>
+                  </Col>
+                  <Col lg={8}>
+                    <Card className="border-0 shadow-sm" style={{ borderRadius: '15px' }}>
+                      <Card.Body className="p-4">
+                        <Row className="g-4">
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="KTP" filePath="ktp" fileUrl={ktpPrev2} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.ktp ? "is-invalid" : ""}`}
-                                id="ktp"
                                 onChange={(e) => handleKtp(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.ktp}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="ktp">
-                                {ktp ? ktp.name : "Pilih file..."}
-                              </label>
-                              {errors.ktp && <div className="invalid-feedback">{errors.ktp[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.ktp?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="akte" className="form-label">
-                              <DocumentPreview label="Akte Lahir" filePath="akte" fileUrl={aktePrev} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Akte Lahir" filePath="akte" fileUrl={aktePrev} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.akte ? "is-invalid" : ""}`}
-                                id="akte"
                                 onChange={(e) => handleakte(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.akte}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="akte">
-                                {akte ? akte.name : "Pilih file..."}
-                              </label>
-                              {errors.akte && <div className="invalid-feedback">{errors.akte[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.akte?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="kartuKeluarga" className="form-label">
-                              <DocumentPreview
-                                label="Kartu Keluarga"
-                                filePath="kartu_keluarga"
-                                fileUrl={kartuKeluargaPrev}
-                              />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Kartu Keluarga" filePath="kartu_keluarga" fileUrl={kartuKeluargaPrev} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.kartuKeluarga ? "is-invalid" : ""}`}
-                                id="kartuKeluarga"
                                 onChange={(e) => handleKartuKeluarga(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.kartuKeluarga}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="kartuKeluarga">
-                                {kartuKeluarga ? kartuKeluarga.name : "Pilih file..."}
-                              </label>
-                              {errors.kartuKeluarga && (
-                                <div className="invalid-feedback">{errors.kartuKeluarga[0]}</div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.kartuKeluarga?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="buktiLulus" className="form-label">
-                              <DocumentPreview
-                                label="Bukti Lulus"
-                                filePath="bukti_lulus"
-                                fileUrl={buktiLulusPrev}
-                                required={true}
-                              />
-                              <OverlayTrigger
-                                placement="right"
-                                delay={{ show: 250, hide: 400 }}
-                                overlay={renderTooltip}
-                              >
-                                <i className="fas fa-info-circle text-info ml-1"></i>
-                              </OverlayTrigger>
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Bukti Lulus" filePath="bukti_lulus" fileUrl={buktiLulusPrev} required={true} />
+                                <OverlayTrigger placement="top" overlay={renderTooltip}>
+                                  <i className="fas fa-info-circle text-primary ml-1 opacity-50"></i>
+                                </OverlayTrigger>
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.buktiLulus ? "is-invalid" : ""}`}
-                                id="buktiLulus"
                                 onChange={(e) => handleBuktiLulus(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.buktiLulus}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="buktiLulus">
-                                {buktiLulus ? buktiLulus.name : "Pilih file..."}
-                              </label>
-                              {errors.buktiLulus && <div className="invalid-feedback">{errors.buktiLulus[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.buktiLulus?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="ijazahTerakhir" className="form-label">
-                              <DocumentPreview
-                                label="Ijazah Terakhir"
-                                filePath="ijazah_terakhir"
-                                fileUrl={ijazahTerakhirPrev}
-                                required={true}
-                              />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Ijazah Terakhir" filePath="ijazah_terakhir" fileUrl={ijazahTerakhirPrev} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.ijazahTerakhir ? "is-invalid" : ""}`}
-                                id="ijazahTerakhir"
                                 onChange={(e) => handleIjazahTerakhir(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.ijazahTerakhir}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="ijazahTerakhir">
-                                {ijazahTerakhir ? ijazahTerakhir.name : "Pilih file..."}
-                              </label>
-                              {errors.ijazahTerakhir && (
-                                <div className="invalid-feedback">{errors.ijazahTerakhir[0]}</div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.ijazahTerakhir?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="skpns" className="form-label">
-                              <DocumentPreview label="SK PNS" filePath="sk_pns" fileUrl={skpnsPrev} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="SK PNS" filePath="sk_pns" fileUrl={skpnsPrev} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.skPns ? "is-invalid" : ""}`}
-                                id="skpns"
                                 onChange={(e) => handleSkpns(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.skPns}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="skpns">
-                                {skpns ? skpns.name : "Pilih file..."}
-                              </label>
-                              {errors.skPns && <div className="invalid-feedback">{errors.skPns[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.skPns?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        {statusPembiayaan === "beasiswa" && (
-                          <div className="col-md-6">
-                            <div className="form-group">
-                              <label htmlFor="skPenerimaBeasiswa" className="form-label">
-                                <DocumentPreview
-                                  label="SK Penerima Beasiswa"
-                                  filePath="sk_penerima_beasiswa"
-                                  fileUrl={skPenerimaBeassiwaPrev}
-                                />
-                              </label>
-                              <div className="custom-file">
-                                <input
+                          {statusPembiayaan === "beasiswa" && (
+                            <Col md={6}>
+                              <Form.Group>
+                                <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                  <DocumentPreview label="SK Penerima Beasiswa" filePath="sk_penerima_beasiswa" fileUrl={skPenerimaBeassiwaPrev} />
+                                </Form.Label>
+                                <Form.Control
                                   type="file"
-                                  className={`custom-file-input ${errors.skPenerimaBeassiwa ? "is-invalid" : ""}`}
-                                  id="skPenerimaBeasiswa"
                                   onChange={(e) => handleChangeSkPenerimaBeasiswa(e.target.files[0])}
                                   accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                  disabled={loadingUpload}
+                                  isInvalid={!!errors.skPenerimaBeassiwa}
+                                  style={{ borderRadius: '10px' }}
                                 />
-                                <label className="custom-file-label" htmlFor="skPenerimaBeasiswa">
-                                  {skPenerimaBeassiwa ? skPenerimaBeassiwa.name : "Pilih file..."}
-                                </label>
-                                {errors.skPenerimaBeassiwa && (
-                                  <div className="invalid-feedback">{errors.skPenerimaBeassiwa[0]}</div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                                <Form.Control.Feedback type="invalid">{errors.skPenerimaBeassiwa?.[0]}</Form.Control.Feedback>
+                              </Form.Group>
+                            </Col>
+                          )}
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="buktiRekomendasiAsal" className="form-label">
-                              <DocumentPreview
-                                label="Bukti Rekomendasi Asal"
-                                filePath="bukti_rekomendasi_asal"
-                                fileUrl={buktiRekomendasiAsalPrev}
-                              />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Bukti Rekomendasi Asal" filePath="bukti_rekomendasi_asal" fileUrl={buktiRekomendasiAsalPrev} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.buktiRekomendasiAsal ? "is-invalid" : ""}`}
-                                id="buktiRekomendasiAsal"
                                 onChange={(e) => handleChangeBuktiRekomendasiAsal(e.target.files[0])}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.buktiRekomendasiAsal}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="buktiRekomendasiAsal">
-                                {buktiRekomendasiAsal ? buktiRekomendasiAsal.name : "Pilih file..."}
-                              </label>
-                              {errors.buktiRekomendasiAsal && (
-                                <div className="invalid-feedback">{errors.buktiRekomendasiAsal[0]}</div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.buktiRekomendasiAsal?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="str" className="form-label">
-                              <DocumentPreview label="STR" filePath="str" fileUrl={strPrev} required={true} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="STR" filePath="str" fileUrl={strPrev} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.str ? "is-invalid" : ""}`}
-                                id="str"
                                 onChange={(e) => handlestr(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.str}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="str">
-                                {str ? str.name : "Pilih file..."}
-                              </label>
-                              {errors.str && <div className="invalid-feedback">{errors.str[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.str?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="sip" className="form-label">
-                              <DocumentPreview label="SIP" filePath="sip" fileUrl={sipPrev} required={true} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="SIP" filePath="sip" fileUrl={sipPrev} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.sip ? "is-invalid" : ""}`}
-                                id="sip"
                                 onChange={(e) => handlesip(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.sip}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="sip">
-                                {sip ? sip.name : "Pilih file..."}
-                              </label>
-                              {errors.sip && <div className="invalid-feedback">{errors.sip[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.sip?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="bpjs" className="form-label">
-                              <DocumentPreview label="BPJS" filePath="bpjs" fileUrl={bpjsPrev} required={true} />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="BPJS" filePath="bpjs" fileUrl={bpjsPrev} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.bpjs ? "is-invalid" : ""}`}
-                                id="bpjs"
                                 onChange={(e) => handlebpjs(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.bpjs}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="bpjs">
-                                {bpjs ? bpjs.name : "Pilih file..."}
-                              </label>
-                              {errors.bpjs && <div className="invalid-feedback">{errors.bpjs[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.bpjs?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="pasFoto" className="form-label">
-                              <DocumentPreview
-                                label="Pas Foto"
-                                filePath="pas_foto"
-                                fileUrl={pasFotoPrev}
-                                required={true}
-                              />
-                              <i className="fas fa-info-circle text-info ml-1" title="Foto dengan Jas Dokter"></i>
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={6}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Pas Foto" filePath="pas_foto" fileUrl={pasFotoPrev} required={true} />
+                                <OverlayTrigger placement="top" overlay={<Tooltip>Gunakan foto terbaru dengan jas dokter.</Tooltip>}>
+                                  <i className="fas fa-info-circle text-primary ml-1 opacity-50"></i>
+                                </OverlayTrigger>
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.pasFoto ? "is-invalid" : ""}`}
-                                id="pasFoto"
                                 onChange={(e) => handlePasFoto(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.pasFoto}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="pasFoto">
-                                {pasFoto ? pasFoto.name : "Pilih file..."}
-                              </label>
-                              {errors.pasFoto && <div className="invalid-feedback">{errors.pasFoto[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.pasFoto?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
 
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label htmlFor="nilaiToefl" className="form-label">
-                              <DocumentPreview
-                                label="Nilai TOEFL/EPT"
-                                filePath="nilai_toefl"
-                                fileUrl={nilaiToeflPrev}
-                                required={true}
-                              />
-                            </label>
-                            <div className="custom-file">
-                              <input
+                          <Col md={12}>
+                            <Form.Group>
+                              <Form.Label className="small font-weight-bold text-muted text-uppercase mb-2">
+                                <DocumentPreview label="Nilai TOEFL/EPT" filePath="nilai_toefl" fileUrl={nilaiToeflPrev} required={true} />
+                              </Form.Label>
+                              <Form.Control
                                 type="file"
-                                className={`custom-file-input ${errors.nilaiToefl ? "is-invalid" : ""}`}
-                                id="nilaiToefl"
                                 onChange={(e) => handleNilaiToefl(e)}
                                 accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps"
-                                disabled={loadingUpload}
+                                isInvalid={!!errors.nilaiToefl}
+                                style={{ borderRadius: '10px' }}
                               />
-                              <label className="custom-file-label" htmlFor="nilaiToefl">
-                                {nilaiToefl ? nilaiToefl.name : "Pilih file..."}
-                              </label>
-                              {errors.nilaiToefl && <div className="invalid-feedback">{errors.nilaiToefl[0]}</div>}
-                            </div>
-                          </div>
-                        </div>
+                              <Form.Control.Feedback type="invalid">{errors.nilaiToefl?.[0]}</Form.Control.Feedback>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </Row>
 
-                        <div className="col-md-12 mt-4">
-                          <div className="form-actions">
-                            <button
-                              className="btn btn-primary btn-lg"
-                              type="submit"
-                              onClick={handleSave}
-                              disabled={loading || loadingUpload}
-                            >
-                              {loading ? (
-                                <>
-                                  <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                  />
-                                  Menyimpan...
-                                </>
-                              ) : (
-                                <>
-                                  <i className="fas fa-save mr-2"></i>
-                                  Simpan Perubahan
-                                </>
-                              )}
-                            </button>
-                            <a href="/dashboard" className="btn btn-light btn-lg ml-2">
-                              <i className="fas fa-times mr-2"></i>
-                              Batal
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                  )}
-                </div>
+                {/* Form Actions Section */}
+                <Row className="">
+                  <Col lg={{ span: 8, offset: 4 }}>
+                    <div className="d-flex gap-3 align-items-center">
+                      <button
+                        className="btn btn-primary d-flex align-items-center justify-content-center shadow-lg border-0"
+                        style={{ borderRadius: '12px', padding: '14px 40px', fontWeight: '600', transition: 'all 0.3s' }}
+                        type="submit"
+                        disabled={loading || loadingUpload}
+                      >
+                        {loading ? (
+                          <>
+                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="mr-2" />
+                            Menyimpan...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-save mr-2"></i>
+                            Simpan Perubahan
+                          </>
+                        )}
+                      </button>
+                      <a
+                        href="/dashboard"
+                        className="btn btn-link text-muted font-weight-bold text-decoration-none"
+                        style={{ fontSize: '0.95rem' }}
+                      >
+                        Batal
+                      </a>
+                    </div>
+                  </Col>
+                </Row>
               </div>
-            </div>
-          </div>
+            </Form>
+          )}
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default Biodata
+export default Biodata;

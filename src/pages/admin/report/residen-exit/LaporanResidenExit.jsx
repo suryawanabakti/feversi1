@@ -111,32 +111,16 @@ const LaporanResidenExit = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <Row className="w-100 align-items-center">
-            <Col>
-              <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Laporan Residen Keluar</h1>
-              <p className="text-muted mt-1">Analisis data residen yang telah keluar (DO, Mengundurkan Diri, dsb).</p>
-            </Col>
-            <Col xs="auto">
-              <div className="d-flex gap-2">
-                <Button
-                  variant="outline-secondary"
-                  onClick={handleReset}
-                  className="rounded-pill px-4 fw-bold shadow-none"
-                  style={{ border: '2px solid #e2e8f0' }}
-                >
-                  <i className="fas fa-sync-alt mr-2"></i> Reset
-                </Button>
-                <a
-                  href={exportUrl}
-                  className="btn btn-success fw-bold px-4 rounded-pill shadow-sm"
-                >
-                  <i className="fas fa-file-excel mr-2"></i> Export Excel
-                </a>
-              </div>
-            </Col>
-          </Row>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Laporan Residen Keluar</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Laporan Residen Keluar</div>
+          </div>
         </div>
+
 
         <div className="section-body mt-4 text-left">
           <Card className="border-0 shadow-sm mb-4 overflow-hidden" style={{ borderRadius: '15px' }}>
@@ -146,23 +130,20 @@ const LaporanResidenExit = () => {
                   <Col md={4}>
                     <Form.Label className="small fw-bold text-muted text-uppercase">Cari Nama / NIM</Form.Label>
                     <InputGroup className="bg-light border-0" style={{ borderRadius: '10px', overflow: 'hidden' }}>
-                      <InputGroup.Text className="bg-transparent border-0 text-muted">
-                        <i className="fas fa-search"></i>
-                      </InputGroup.Text>
+
                       <Form.Control
-                        className="bg-transparent border-0"
+
                         placeholder="Ketik nama atau NIM..."
                         value={term}
                         onChange={(e) => setTerm(e.target.value)}
-                        style={{ height: '45px' }}
+
                       />
                     </InputGroup>
                   </Col>
                   <Col md={3}>
                     <Form.Label className="small fw-bold text-muted text-uppercase">Program Studi</Form.Label>
                     <Form.Select
-                      className="bg-light border-0"
-                      style={{ borderRadius: '10px', height: '45px' }}
+
                       value={filters.prodi_id}
                       onChange={(e) => handleFilterChange("prodi_id", e.target.value)}
                     >
@@ -175,8 +156,7 @@ const LaporanResidenExit = () => {
                   <Col md={3}>
                     <Form.Label className="small fw-bold text-muted text-uppercase">Alasan Keluar</Form.Label>
                     <Form.Select
-                      className="bg-light border-0"
-                      style={{ borderRadius: '10px', height: '45px' }}
+
                       value={filters.alasan}
                       onChange={(e) => handleFilterChange("alasan", e.target.value)}
                     >

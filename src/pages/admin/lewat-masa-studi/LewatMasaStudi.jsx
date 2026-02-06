@@ -105,10 +105,13 @@ export default function LewatMasaStudi() {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Lewat Masa Studi</h1>
-            <p className="text-muted mt-1">Daftar residen yang belum lulus meskipun telah melewati masa studi normal.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Lewat Masa Studi</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Lewat Masa Studi</div>
           </div>
         </div>
 
@@ -133,13 +136,11 @@ export default function LewatMasaStudi() {
                   <div className="row g-3">
                     <div className="col-md-4">
                       <InputGroup>
-                        <InputGroup.Text className="bg-light border-0">
-                          <i className="fas fa-search text-muted"></i>
-                        </InputGroup.Text>
+
                         <Form.Control
-                          className="bg-light border-0"
+
                           placeholder="Cari Nama / NIM..."
-                          style={{ borderRadius: '0 10px 10px 0', height: '45px' }}
+
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -148,8 +149,7 @@ export default function LewatMasaStudi() {
                     {user?.roles?.[0]?.name === "admin" && (
                       <div className="col-md-4 text-left">
                         <Form.Select
-                          className="bg-light border-0"
-                          style={{ borderRadius: '10px', height: '45px' }}
+
                           value={prodiId}
                           onChange={handleProdiChange}
                         >

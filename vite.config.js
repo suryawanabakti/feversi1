@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       '^/(api|sanctum|login|logout|storage)': {
-        target: 'https://datapppds2.med.unhas.ac.id',
+        target: 'http://bankdatapppds.test',
         changeOrigin: true,
         secure: false,
-        cookieDomainRewrite: "datapppds2.med.unhas.ac.id",
+        cookieDomainRewrite: "bankdatapppds.test",
         bypass: (req) => {
           if (req.method === 'GET' && req.headers.accept?.includes('text/html')) {
             return '/index.html';

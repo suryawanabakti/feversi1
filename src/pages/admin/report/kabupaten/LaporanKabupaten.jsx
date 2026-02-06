@@ -7,6 +7,19 @@ import { Card, Table, Form, InputGroup, Button, Badge } from "react-bootstrap";
 import useAuthContext from "../../../../context/AuthContext";
 import "leaflet/dist/leaflet.css";
 
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 const LaporanKabupaten = () => {
   const { user } = useAuthContext();
   const isAdmin = user?.roles?.[0]?.name === "admin";
@@ -67,10 +80,13 @@ const LaporanKabupaten = () => {
   return (
     <div className="main-content">
       <section className="section">
-        <div className="section-header border-bottom-0 pb-0 bg-transparent shadow-none">
-          <div>
-            <h1 className="text-dark" style={{ fontWeight: 800, fontSize: '1.75rem' }}>Sebaran per Kabupaten</h1>
-            <p className="text-muted mt-1">Populasi residen berdasarkan kabupaten/kota di seluruh Indonesia.</p>
+        <div className="section-header d-flex justify-content-between align-items-center">
+          <h1 className="font-weight-bold">Sebaran Per Kabupaten</h1>
+          <div className="section-header-breadcrumb">
+            <div className="breadcrumb-item">
+              <Link to="/dashboard">Dashboard</Link>
+            </div>
+            <div className="breadcrumb-item active">Sebaran Kabupaten</div>
           </div>
         </div>
 
@@ -90,8 +106,7 @@ const LaporanKabupaten = () => {
                           <Form.Label className="text-dark small font-weight-bold mb-1">Program Studi</Form.Label>
                           <Form.Select
                             name="prodiId"
-                            className="border-0 bg-light"
-                            style={{ borderRadius: '10px', height: '45px' }}
+
                             value={filters.prodiId}
                             onChange={handleFilterChange}
                           >
@@ -108,8 +123,7 @@ const LaporanKabupaten = () => {
                         <Form.Label className="text-dark small font-weight-bold mb-1">Status Keanggotaan</Form.Label>
                         <Form.Select
                           name="status"
-                          className="border-0 bg-light"
-                          style={{ borderRadius: '10px', height: '45px' }}
+
                           value={filters.status}
                           onChange={handleFilterChange}
                         >
@@ -125,13 +139,13 @@ const LaporanKabupaten = () => {
           </Card>
 
           <div className="row">
-            <div className="col-lg-8">
-              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px' }}>
+            <div className="col-lg-12">
+              <Card className="border-0 shadow-sm overflow-hidden mb-4" style={{ borderRadius: '15px' }}>
                 <Card.Header className="bg-white border-bottom-0 py-3 px-4">
                   <h4 className="m-0 text-dark" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Peta Sebaran</h4>
                 </Card.Header>
                 <Card.Body className="p-0">
-                  <div style={{ height: "600px", width: "100%" }}>
+                  <div style={{ height: "650px", width: "100%" }}>
                     <MapContainer
                       center={[-0.789275, 113.921327]}
                       zoom={5}
@@ -168,8 +182,8 @@ const LaporanKabupaten = () => {
               </Card>
             </div>
 
-            <div className="col-lg-4">
-              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px', height: "664px" }}>
+            <div className="col-lg-12">
+              <Card className="border-0 shadow-sm overflow-hidden" style={{ borderRadius: '15px' }}>
                 <Card.Header className="bg-white border-bottom-0 py-3 px-4">
                   <h4 className="m-0 text-dark" style={{ fontSize: '1.1rem', fontWeight: 700 }}>Tabel Data</h4>
                 </Card.Header>
