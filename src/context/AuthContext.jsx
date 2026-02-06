@@ -19,11 +19,16 @@ export const AuthProvider = ({ children }) => {
   const getUser = async () => {
     try {
       const { data } = await axios.get("/api/user");
-      setUser(data);
+      // Safety check: ensure we got a valid user object, not HTML or something else
+      if (data && typeof data === 'object' && data.id) {
+        setUser(data);
+      }
       setLoading(false);
     } catch (error) {
-      console.log("ERROR", error)
-      console.error("Auth check failed:", error.message);
+      // Only log errors that aren't 401 (Unauthenticated) to keep console clean
+      if (error.response?.status !== 401) {
+        console.error("Auth check failed:", error.message);
+      }
       setLoading(false);
       navigate("/login");
     }
